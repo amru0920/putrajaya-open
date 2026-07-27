@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MSSPP — Pentadbir</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--blue:#2C5CA8;--blueDark:#1B4079;--blueSoft:#E8EEF8;--yellow:#F2DE1B;--ink:#152238;--muted:#6B7A94;
+        --bg:#F2F5FA;--card:#fff;--line:#D9E1EE;--win:#1B7A4A;--danger:#C0392B}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+  .wrap{max-width:660px;margin:0 auto;padding:16px 16px 70px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{width:44px;height:44px}
+  h1{font-family:Archivo;font-weight:800;font-size:17px;margin:0;color:var(--blueDark)}
+  .sub{color:var(--muted);font-size:12px}
+  .login{max-width:350px;margin:60px auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;border-top:4px solid var(--yellow)}
+  .login .brand{justify-content:center;margin-bottom:14px}
+  input,select{width:100%;padding:11px 12px;margin-top:8px;background:#fff;border:1px solid var(--line);color:var(--ink);border-radius:9px;font-size:14px;font-family:inherit}
+  button{font-family:Archivo;font-weight:700;cursor:pointer;border:none;border-radius:9px}
+  .btn{width:100%;padding:12px;margin-top:12px;background:var(--blue);color:#fff;font-size:14px}
+  .btn.yellow{background:var(--yellow);color:var(--blueDark)}
+  .err{color:var(--danger);font-size:12px;margin-top:10px;min-height:14px}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:6px 0 14px}
+  .out{background:#fff;color:var(--muted);border:1px solid var(--line);padding:7px 12px;font-size:12px}
+  .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;font-family:Archivo;font-weight:700;font-size:13px;color:var(--blueDark);background:#fff;border:1px solid var(--line);padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .tab.on{background:var(--yellow);border-color:var(--yellow)}
+  .mode{display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+  .mode button{flex:1;padding:11px;background:#fff;color:var(--muted);font-size:12.5px;border-radius:0}
+  .mode button.on{background:var(--blue);color:#fff}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+  .card.form{border-left:4px solid var(--yellow)}
+  .card h3{font-family:Archivo;font-size:13px;margin:0 0 6px;color:var(--blueDark)}
+  .hint{font-size:12px;color:var(--muted);margin:2px 0 8px;line-height:1.5}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid2 input,.grid2 select{margin-top:0}
+  .mc.done{opacity:.7}
+  .meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:10px}
+  .done-tag{color:var(--win);font-weight:600}
+  .row{display:grid;grid-template-columns:1fr 74px;gap:10px;align-items:center;margin:6px 0}
+  .row input{margin:0;text-align:center;font-family:Archivo;font-weight:800;font-size:18px}
+  .row select{margin:0}
+  .lock{font-weight:600;font-size:14px;padding:11px 12px;background:var(--blueSoft);border-radius:9px;color:var(--blueDark)}
+  .lock.tbd{color:var(--muted);font-style:italic;font-weight:400}
+  .foot{display:flex;gap:8px;margin-top:12px}
+  .save{flex:1;padding:11px;background:var(--win);color:#fff;font-size:13px}
+  .ghost{padding:11px 13px;background:#fff;color:var(--muted);border:1px solid var(--line);font-size:13px}
+  .del{padding:11px 13px;background:#fff;color:var(--danger);border:1px solid var(--line);font-size:13px}
+  .livebtn{padding:11px 13px;background:#fff;color:#E11D48;border:1px solid #F5C2CB;font-size:13px}
+  .livebtn.on{background:#E11D48;color:#fff;border-color:#E11D48}
+  .msg{font-size:11px;text-align:right;margin-top:6px;min-height:13px}
+  .team-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--blueSoft)}
+  .team-row:last-child{border-bottom:none}
+  .team-row .name{flex:1;font-weight:600;font-size:14px}
+  .team-row select{width:82px;margin:0;padding:7px 8px;font-size:13px}
+  .team-row select[data-seed]{width:64px}
+  .team-row select[data-rank]{width:120px;margin:0;padding:7px 8px;font-size:13px}
+  .mini{padding:8px 11px;font-size:12px}
+  .hidden{display:none}
+
+  /* Editable schedule table */
+  .sched-edit-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px}
+  table.sed{border-collapse:collapse;width:100%;min-width:640px}
+  table.sed thead th{background:var(--blue);color:#fff;font-family:Archivo;font-weight:700;
+    font-size:10.5px;letter-spacing:.06em;padding:9px 6px;text-align:center;white-space:nowrap}
+  table.sed td{border-bottom:1px solid var(--blueSoft);padding:5px 6px;text-align:center;vertical-align:middle}
+  table.sed tr:last-child td{border-bottom:none}
+  table.sed tr.done-row td{background:#F5F9F5}
+  table.sed input,table.sed select{margin:0;padding:7px 8px;font-size:12.5px;border-radius:7px}
+  .in-bil{width:52px;text-align:center;font-family:Archivo;font-weight:800}
+  .in-time{width:66px;text-align:center;font-family:Archivo;font-weight:700}
+  .in-team{width:100%;min-width:132px}
+  .kumptag{font-family:Archivo;font-weight:800;font-size:10.5px;background:var(--blueSoft);
+    color:var(--blueDark);padding:4px 8px;border-radius:5px;white-space:nowrap}
+  .lockcell{font-size:12.5px;color:var(--muted);font-style:italic;padding:0 6px}
+  .sc-score{display:flex;gap:4px;align-items:center;justify-content:center}
+  .sc-score input{width:42px;text-align:center;font-family:Archivo;font-weight:800;font-size:14px}
+  .sc-final{font-family:Archivo;font-weight:800;font-size:14px;color:var(--win);white-space:nowrap}
+  .sed-act{display:flex;gap:4px;justify-content:center}
+  .ico{padding:7px 9px;font-size:12px;background:#fff;border:1px solid var(--line);color:var(--muted)}
+  .ico.go{color:var(--win);border-color:#BFE0CC}
+  .ico.rm{color:var(--danger)}
+  .ico.lv{color:#E11D48;border-color:#F5C2CB}
+  .ico.lv.on{background:#E11D48;color:#fff;border-color:#E11D48}
+  .vs-lbl{color:var(--muted);font-size:11px}
+  .danger-zone{border-left:4px solid var(--danger);margin-top:14px}
+  .danger-zone h3{color:var(--danger)}
+  .today-dot{font-family:Archivo;font-weight:800;font-size:8.5px;letter-spacing:.06em;
+    background:#E11D48;color:#fff;padding:2px 6px;border-radius:999px;margin-left:5px;vertical-align:middle}
+
+  /* Category banner + group layout (Setup) */
+  .cat-banner{display:flex;align-items:center;gap:8px;background:var(--yellow);
+    color:var(--blueDark);font-family:Archivo;font-weight:800;font-size:14px;
+    padding:11px 16px;border-radius:10px;margin-bottom:12px}
+  .cat-banner small{font-family:Inter;font-weight:500;color:var(--blueDark);opacity:.75;font-size:12px}
+  .glayout{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .gbox{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .gbox-h{background:var(--blue);color:#fff;font-family:Archivo;font-weight:800;font-size:13px;padding:8px 12px}
+  .gbox-r{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--blueSoft);font-size:13.5px}
+  .gbox-r:last-child{border-bottom:none}
+  .gbox-seed{font-family:Archivo;font-weight:800;font-size:11px;color:#fff;background:var(--blue);
+    padding:2px 7px;border-radius:5px;min-width:26px;text-align:center}
+  .gbox-empty{color:var(--muted);font-style:italic;font-size:12px;padding:8px 12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="login" class="login">
+    <div class="brand"><img src="msspp-logo.png" alt=""><h1>Pentadbir MSSPP</h1></div>
+    <input id="email" type="email" placeholder="Emel" autocomplete="username">
+    <input id="pass" type="password" placeholder="Kata laluan" autocomplete="current-password">
+    <button class="btn" id="btnLogin">Log masuk</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <div id="panel" class="hidden">
+    <div class="topbar">
+      <div class="brand"><img src="msspp-logo.png" alt="">
+        <div><h1>Pentadbir Kejohanan</h1><div class="sub" id="who"></div></div></div>
+      <button class="out" id="btnOut">Log keluar</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div class="mode">
+      <button class="on" data-mode="setup">1 · Setup</button>
+      <button data-mode="group">2 · Kumpulan</button>
+      <button data-mode="ko">3 · Kalah Mati</button>
+      <button data-mode="sched">4 · Jadual</button>
+    </div>
+
+    <!-- SETUP -->
+    <div id="m-setup">
+      <div class="cat-banner" id="catBanner"></div>
+
+      <div class="card form">
+        <h3>📅 Tarikh Pertandingan Kategori Ini</h3>
+        <div class="hint">Status <b>SEDANG BERMAIN</b> automatik hanya aktif pada tarikh ini. Tab kategori juga akan bertanda <b>HARI INI</b> untuk penonton.</div>
+        <input type="date" id="catDate">
+        <div class="msg" id="cd-msg"></div>
+      </div>
+      <div class="card form">
+        <h3>Tambah Pasukan</h3>
+        <div class="grid2">
+          <input id="nt-name" placeholder="Nama pasukan / daerah">
+          <select id="nt-group"></select>
+        </div>
+        <button class="btn" id="btnAddTeam">Tambah Pasukan</button>
+        <div class="msg" id="nt-msg"></div>
+      </div>
+
+      <div class="card"><h3>Susunan Kumpulan</h3><div id="groupLayout"></div></div>
+
+      <div class="card"><h3>Senarai Pasukan</h3><div id="teamList"></div></div>
+    </div>
+
+    <!-- GROUP STAGE -->
+    <div id="m-group" class="hidden">
+      <div class="card form">
+        <h3>➕ Tambah Perlawanan Manual</h3>
+        <div class="hint">Ikut jadual rasmi you. Isi BIL & MASA kalau nak (ikut jadual bertulis), pilih kumpulan & pasukan.</div>
+        <div class="grid2" style="margin-bottom:8px">
+          <input id="mm-no" type="number" min="1" placeholder="BIL (cth: 1)">
+          <input id="mm-time" placeholder="MASA (cth: 0830)">
+        </div>
+        <select id="mm-group" style="margin-bottom:8px"></select>
+        <div class="grid2">
+          <select id="mm-a"><option value="">Pasukan A</option></select>
+          <select id="mm-b"><option value="">Pasukan B</option></select>
+        </div>
+        <button class="btn" id="btnAddManual">Tambah Perlawanan</button>
+        <div class="msg" id="mm-msg"></div>
+      </div>
+
+      <div class="card form">
+        <h3>⚡ Jana Jadual Auto (Round Robin)</h3>
+        <div class="hint">Cepat tapi turutan ikut sistem, bukan jadual rasmi. Guna kalau tak kisah susunan.</div>
+        <button class="btn yellow" id="btnGenGroup">Jana Jadual Semua Kumpulan</button>
+        <button class="del" id="btnClearGroup" style="width:100%;margin-top:8px">🗑️ Padam Semua Perlawanan Kumpulan</button>
+        <div class="msg" id="gg-msg"></div>
+      </div>
+      <div id="groupMatches"></div>
+    </div>
+
+    <!-- KNOCKOUT -->
+    <div id="m-ko" class="hidden">
+      <div class="card form">
+        <h3>⚡ Jana Bracket Kalah Mati</h3>
+        <div class="hint">Pilih saiz. Sistem buat bracket kosong + pautan auto: <b>pemenang naik sendiri</b> ke perlawanan seterusnya, yang kalah Separuh Akhir masuk Tempat Ke-3. You cuma isi pasukan pusingan pertama.</div>
+        <select id="ko-size">
+          <option value="4">4 pasukan — SF → Akhir + Tempat Ke-3</option>
+          <option value="8">8 pasukan — QF → SF → Akhir + Tempat Ke-3</option>
+        </select>
+        <button class="btn yellow" id="btnGenKO">Jana Bracket</button>
+        <div class="msg" id="gk-msg"></div>
+      </div>
+      <div id="koMatches"></div>
+    </div>
+
+    <!-- SCHEDULE (editable table) -->
+    <div id="m-sched" class="hidden">
+      <div class="card form">
+        <h3>📋 Jadual Penuh — Boleh Edit</h3>
+        <div class="hint">Semua perlawanan dalam satu jadual. Ubah <b>BIL</b>, <b>MASA</b> atau pasukan terus di dalam petak — auto simpan. Susunan ikut BIL, sama macam jadual rasmi.</div>
+        <button class="btn" id="btnRenumber">🔢 Nomborkan Semula BIL (1,2,3…) ikut susunan sekarang</button>
+        <button class="btn yellow" id="btnSyncKump">🔄 Betulkan KUMP Ikut Pasukan</button>
+        <div class="msg" id="sc-msg"></div>
+      </div>
+      <div class="sched-edit-wrap" id="schedTable"></div>
+
+      <div class="card danger-zone">
+        <h3>⚠️ Zon Reset</h3>
+        <div class="hint">Untuk kategori <b id="rzCat">—</b> sahaja. Kategori lain tak terjejas.</div>
+        <button class="del" id="btnResetScores" style="width:100%;margin-top:4px">🧹 Reset Semua Skor (pasukan & jadual kekal)</button>
+        <button class="del" id="btnResetKO" style="width:100%;margin-top:8px">🧹 Reset Pasukan Kalah Mati (SF · Akhir · Tempat Ke-3)</button>
+        <div class="msg" id="rz-msg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+const $ = s => document.querySelector(s);
+const ROUND = { group:"Kumpulan", qf:"Suku Akhir", sf:"Separuh Akhir", third:"Tempat Ke-3", final:"Akhir" };
+const GROUPS = ["A","B","C","D"];
+const RANK_OPTIONS = [[1,"Johan"],[2,"Naib Johan"],[3,"Ketiga Bersama"],[5,"Ke-5"],[6,"Ke-6"],[7,"Ke-7"],[8,"Ke-8"],[9,"Ke-9"]];
+
+let cats=[], cat=null, teamList=[], teams={}, matches=[];
+
+// ---------- auth ----------
+$("#btnLogin").onclick = async () => {
+  $("#loginErr").textContent="";
+  const { error } = await sb.auth.signInWithPassword({ email:$("#email").value.trim(), password:$("#pass").value });
+  error ? $("#loginErr").textContent="Log masuk gagal." : boot();
+};
+$("#btnOut").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+async function boot(){
+  const { data:{session} } = await sb.auth.getSession();
+  if(!session){ $("#login").classList.remove("hidden"); $("#panel").classList.add("hidden"); return; }
+  $("#login").classList.add("hidden"); $("#panel").classList.remove("hidden");
+  $("#who").textContent = session.user.email;
+  const { data } = await sb.from("categories").select("*").order("sort_order");
+  cats=data||[]; if(cats.length && !cat) cat=cats[0].id;
+  tabs(); if(cat) load();
+}
+function tabs(){
+  const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD tempatan
+  $("#tabs").innerHTML = cats.map(c=>{
+    const isToday = c.event_date===today;
+    return `<div class="tab ${c.id===cat?'on':''}" data-id="${c.id}">${c.name}${isToday?' <span class="today-dot">HARI INI</span>':''}</div>`;
+  }).join("");
+  $("#tabs").querySelectorAll(".tab").forEach(el=>el.onclick=()=>{cat=+el.dataset.id;tabs();load();});
+}
+document.querySelectorAll(".mode button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".mode button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");
+  ["setup","group","ko","sched"].forEach(m=>$("#m-"+m).classList.toggle("hidden", m!==b.dataset.mode));
+});
+
+async function load(){
+  const [{data:tm},{data:mt}] = await Promise.all([
+    sb.from("teams").select("*").eq("category_id",cat)
+      .order("group_label",{nullsFirst:false}).order("seed_no",{nullsFirst:false}).order("name"),
+    sb.from("matches").select("*").eq("category_id",cat).order("match_no",{nullsFirst:false}).order("id"),
+  ]);
+  teamList=tm||[]; teams=Object.fromEntries(teamList.map(t=>[t.id,t])); matches=mt||[];
+  $("#nt-group").innerHTML = GROUPS.map(g=>`<option value="${g}">Kumpulan ${g}</option>`).join("");
+  fillManualForm();
+  renderCatBanner(); renderGroupLayout();
+  renderTeams(); renderGroup(); renderKO(); renderSchedTable();
+}
+const nm = id => teams[id]?.name || null;
+
+// Category banner — make it obvious which category you're editing
+function renderCatBanner(){
+  const c = cats.find(x=>x.id===cat);
+  $("#catBanner").innerHTML = c
+    ? `📋 Sedang urus: ${c.name} <small>· ${teamList.length} pasukan · setiap kategori berasingan</small>`
+    : "";
+  const rz=$("#rzCat"); if(rz) rz.textContent = c?c.name:"—";
+  const cd=$("#catDate"); if(cd) cd.value = c?.event_date || "";
+}
+
+// Visual group layout (macam jadual rasmi: A1, A2… B1, B2…)
+function renderGroupLayout(){
+  const grouped={};
+  teamList.forEach(t=>{ if(t.group_label)(grouped[t.group_label]||=[]).push(t); });
+  const labels=GROUPS.filter(g=>grouped[g]?.length);
+  if(!labels.length){ $("#groupLayout").innerHTML=`<div class="gbox-empty">Belum ada pasukan dalam kumpulan. Tambah pasukan di atas.</div>`; return; }
+  const bySeed=(a,b)=>((a.seed_no||99)-(b.seed_no||99))||a.name.localeCompare(b.name);
+  $("#groupLayout").innerHTML = `<div class="glayout">${
+    labels.map(g=>`<div class="gbox">
+      <div class="gbox-h">KUMPULAN ${g}</div>
+      ${[...grouped[g]].sort(bySeed).map(t=>`<div class="gbox-r">
+        <span class="gbox-seed">${g}${t.seed_no||'?'}</span>${t.name}
+      </div>`).join("")}
+    </div>`).join("")
+  }</div>`;
+}
+
+// populate manual-add dropdowns
+function fillManualForm(){
+  const opts = teamList.map(t=>`<option value="${t.id}">${t.name}${t.group_label?` (${t.group_label})`:''}</option>`).join("");
+  $("#mm-group").innerHTML = GROUPS.map(g=>`<option value="${g}">Kumpulan ${g}</option>`).join("");
+  $("#mm-a").innerHTML = `<option value="">Pasukan A</option>`+opts;
+  $("#mm-b").innerHTML = `<option value="">Pasukan B</option>`+opts;
+}
+
+// ---------- GROUP: manual add ----------
+$("#btnAddManual").onclick = async () => {
+  const a=$("#mm-a").value, b=$("#mm-b").value, g=$("#mm-group").value;
+  if(!a||!b){ note("#mm-msg","Pilih kedua-dua pasukan.",1); return; }
+  if(a===b){ note("#mm-msg","Pasukan A & B sama.",1); return; }
+  const row={
+    category_id:cat, round:'group', group_label:g,
+    team_a_id:+a, team_b_id:+b,
+    match_no: $("#mm-no").value?+$("#mm-no").value:null,
+    match_time: $("#mm-time").value.trim()||null,
+  };
+  const { error } = await sb.from("matches").insert(row);
+  if(error){ note("#mm-msg","Gagal tambah.",1); return; }
+  // auto-increment BIL untuk kemudahan
+  if($("#mm-no").value) $("#mm-no").value = +$("#mm-no").value + 1;
+  $("#mm-a").value=""; $("#mm-b").value="";
+  note("#mm-msg","Perlawanan ditambah ✓"); load();
+};
+
+// ---------- GROUP: delete all ----------
+$("#btnClearGroup").onclick = async () => {
+  const n = matches.filter(m=>m.round==='group').length;
+  if(!n){ note("#gg-msg","Tiada perlawanan kumpulan.",1); return; }
+  if(!confirm(`Padam SEMUA ${n} perlawanan kumpulan untuk kategori ini? Tindakan ini kekal.`)) return;
+  const { error } = await sb.from("matches").delete().eq("category_id",cat).eq("round","group");
+  error ? note("#gg-msg","Gagal padam.",1) : note("#gg-msg","Semua perlawanan kumpulan dipadam ✓");
+  load();
+};
+
+// ---------- SETUP: teams ----------
+$("#btnAddTeam").onclick = async () => {
+  const name=$("#nt-name").value.trim();
+  if(!name){ note("#nt-msg","Isi nama pasukan.",1); return; }
+  const { error } = await sb.from("teams").insert({ category_id:cat, name, group_label:$("#nt-group").value });
+  if(error){ note("#nt-msg","Gagal.",1); return; }
+  $("#nt-name").value=""; note("#nt-msg","Ditambah ✓"); load();
+};
+function renderTeams(){
+  $("#teamList").innerHTML = teamList.map(t=>`
+    <div class="team-row" data-tid="${t.id}">
+      <span class="name">${t.name}</span>
+      <select data-grp>${GROUPS.map(g=>`<option value="${g}" ${t.group_label===g?'selected':''}>Kump ${g}</option>`).join("")}
+        <option value="" ${!t.group_label?'selected':''}>Tiada</option></select>
+      <select data-seed title="Nombor dalam kumpulan">
+        ${[1,2,3,4,5,6].map(n=>`<option value="${n}" ${t.seed_no===n?'selected':''}>${t.group_label||''}${n}</option>`).join("")}
+        <option value="" ${!t.seed_no?'selected':''}>—</option>
+      </select>
+      <select data-rank title="Kedudukan akhir (manual — ganti kiraan automatik)">
+        <option value="" ${!t.manual_rank?'selected':''}>Auto</option>
+        ${RANK_OPTIONS.map(([v,label])=>`<option value="${v}" ${t.manual_rank===v?'selected':''}>${label}</option>`).join("")}
+      </select>
+      <button class="del mini" data-delteam>✕</button>
+    </div>`).join("") || `<div class="sub">Belum ada pasukan — tambah di atas.</div>`;
+  $("#teamList").querySelectorAll(".team-row").forEach(r=>{
+    const tid=+r.dataset.tid;
+    r.querySelector("[data-grp]").onchange = async e => { await sb.from("teams").update({group_label:e.target.value||null}).eq("id",tid); load(); };
+    r.querySelector("[data-seed]").onchange = async e => { await sb.from("teams").update({seed_no:e.target.value?+e.target.value:null}).eq("id",tid); load(); };
+    r.querySelector("[data-rank]").onchange = async e => {
+      const { error } = await sb.from("teams").update({manual_rank:e.target.value?+e.target.value:null}).eq("id",tid);
+      if(error){ alert("Gagal kemas kini kedudukan: "+error.message); }
+      load();
+    };
+    r.querySelector("[data-delteam]").onclick = async () => {
+      if(!confirm("Padam pasukan ini?")) return;
+      await sb.from("matches").update({team_a_id:null}).eq("team_a_id",tid);
+      await sb.from("matches").update({team_b_id:null}).eq("team_b_id",tid);
+      await sb.from("teams").delete().eq("id",tid); load();
+    };
+  });
+}
+
+// ---------- GROUP: round robin generator ----------
+$("#btnGenGroup").onclick = async () => {
+  const existing = matches.filter(m=>m.round==='group');
+  if(existing.length && !confirm(`Dah ada ${existing.length} perlawanan kumpulan. Jana lagi akan TAMBAH (bukan ganti). Teruskan?`)) return;
+  const rows=[];
+  for(const g of GROUPS){
+    const gt = teamList.filter(t=>t.group_label===g);
+    for(let i=0;i<gt.length;i++)
+      for(let j=i+1;j<gt.length;j++)
+        rows.push({ category_id:cat, round:'group', group_label:g, team_a_id:gt[i].id, team_b_id:gt[j].id });
+  }
+  if(!rows.length){ note("#gg-msg","Tiada pasukan dalam kumpulan lagi.",1); return; }
+  const { error } = await sb.from("matches").insert(rows);
+  error ? note("#gg-msg","Gagal jana.",1) : note("#gg-msg",`${rows.length} perlawanan dijana ✓`);
+  load();
+};
+function renderGroup(){
+  const gm = matches.filter(m=>m.round==='group')
+    .sort((a,b)=>((a.match_no||9999)-(b.match_no||9999)) || (a.id-b.id));
+  $("#groupMatches").innerHTML = gm.map(matchCard).join("") || `<div class="sub">Belum ada perlawanan kumpulan.</div>`;
+  bindCards("#groupMatches");
+}
+
+// ---------- KO: bracket generator with links ----------
+$("#btnGenKO").onclick = async () => {
+  const size=+$("#ko-size").value;
+  if(matches.some(m=>m.round!=='group') && !confirm("Bracket sedia ada akan DIPADAM dan dijana semula. Teruskan?")) return;
+  await sb.from("matches").delete().eq("category_id",cat).neq("round","group");
+
+  // insert final + third first, then link upwards
+  const ins = async r => (await sb.from("matches").insert(r).select().single()).data;
+  const fin   = await ins({category_id:cat, round:'final', bracket_pos:1});
+  const third = await ins({category_id:cat, round:'third', bracket_pos:1});
+  const sf1 = await ins({category_id:cat, round:'sf', bracket_pos:1, next_match_id:fin.id, next_slot:'a', loser_next_match_id:third.id, loser_next_slot:'a'});
+  const sf2 = await ins({category_id:cat, round:'sf', bracket_pos:2, next_match_id:fin.id, next_slot:'b', loser_next_match_id:third.id, loser_next_slot:'b'});
+  if(size===8){
+    await ins({category_id:cat, round:'qf', bracket_pos:1, next_match_id:sf1.id, next_slot:'a'});
+    await ins({category_id:cat, round:'qf', bracket_pos:2, next_match_id:sf1.id, next_slot:'b'});
+    await ins({category_id:cat, round:'qf', bracket_pos:3, next_match_id:sf2.id, next_slot:'a'});
+    await ins({category_id:cat, round:'qf', bracket_pos:4, next_match_id:sf2.id, next_slot:'b'});
+  }
+  note("#gk-msg","Bracket dijana ✓ — isi pasukan pusingan pertama di bawah.");
+  load();
+};
+function renderKO(){
+  const ord={qf:0,sf:1,third:2,final:3};
+  const ko = matches.filter(m=>m.round!=='group').sort((a,b)=>ord[a.round]-ord[b.round] || (a.bracket_pos||0)-(b.bracket_pos||0));
+  $("#koMatches").innerHTML = ko.map(matchCard).join("") || `<div class="sub">Belum ada bracket — jana di atas.</div>`;
+  bindCards("#koMatches");
+}
+
+// ---------- shared match card ----------// First KO round (no incoming feed) = editable dropdown. Fed slots = locked (auto).
+function isFed(m, slot){
+  return matches.some(x => (x.next_match_id===m.id && x.next_slot===slot) || (x.loser_next_match_id===m.id && x.loser_next_slot===slot));
+}
+function matchCard(m){
+  const label = m.round==='group' ? `Kumpulan ${m.group_label}` : `${ROUND[m.round]}${m.round==='qf'||m.round==='sf'?' '+m.bracket_pos:''}`;
+  const sched = [m.match_no?`BIL ${m.match_no}`:'', m.match_time||''].filter(Boolean).join(' · ');
+  return `<div class="card mc ${m.done?'done':''}" data-mid="${m.id}">
+    <div class="meta"><span>${sched?sched+' — ':''}${label}</span>${m.done?'<span class="done-tag">TAMAT ✓</span>':''}</div>
+    ${slotRow(m,'a')}${slotRow(m,'b')}
+    <div class="foot">
+      ${m.done ? `<button class="ghost" data-reopen>Buka semula</button>`
+               : `<button class="save" data-save>Simpan & Tamat</button>
+                  <button class="${m.live?'livebtn on':'livebtn'}" data-live>${m.live?'⏸ Henti':'▶ Mula'}</button>`}
+      <button class="del" data-delmatch>Padam</button>
+    </div><div class="msg"></div>
+  </div>`;
+}
+function slotRow(m,slot){
+  const id = slot==='a'?m.team_a_id:m.team_b_id;
+  const sc = slot==='a'?m.score_a:m.score_b;
+  const fed = m.round!=='group' && isFed(m,slot);
+  const cell = (m.round==='group')
+    ? `<span class="lock">${nm(id)||'—'}</span>`
+    : fed
+      ? `<span class="lock ${id?'':'tbd'}">${nm(id)||'Menunggu pemenang…'}</span>`
+      : `<select data-team="${slot}" ${m.done?'disabled':''}>
+          <option value="">— Pilih pasukan —</option>
+          ${teamList.map(t=>`<option value="${t.id}" ${t.id===id?'selected':''}>${t.name}${t.group_label?` (${t.group_label})`:''}</option>`).join("")}
+        </select>`;
+  return `<div class="row">${cell}
+    <input type="number" min="0" inputmode="numeric" data-score="${slot}" value="${sc??''}" placeholder="0" ${m.done?'disabled':''}></div>`;
+}
+
+function bindCards(root){
+  document.querySelectorAll(`${root} .mc`).forEach(card=>{
+    const mid=+card.dataset.mid, msg=card.querySelector(".msg");
+    const m = matches.find(x=>x.id===mid);
+
+    // Auto-save pasukan sebaik dipilih (tak perlu skor) → terus naik ke bracket
+    card.querySelectorAll("select[data-team]").forEach(sel=>{
+      sel.addEventListener("change", async ()=>{
+        const slot=sel.dataset.team;
+        const col = slot==='a'?'team_a_id':'team_b_id';
+        const other = slot==='a'?m.team_b_id:m.team_a_id;
+        const val = sel.value?+sel.value:null;
+        if(val && val===other){ err(msg,"Pasukan A dan B tak boleh sama."); sel.value=""; return; }
+        const { error } = await sb.from("matches").update({ [col]: val }).eq("id",mid);
+        if(error){ err(msg,"Gagal simpan pasukan."); return; }
+        m[col]=val;                       // update local
+        msg.textContent="Pasukan disimpan ✓"; msg.style.color="var(--win)";
+        setTimeout(()=>msg.textContent="",1800);
+      });
+    });
+
+    card.querySelector("[data-save]")?.addEventListener("click", async ()=>{
+      const patch={ done:true, live:false, played_at:new Date().toISOString() };
+      // team slots: editable selects only
+      for(const slot of ['a','b']){
+        const sel=card.querySelector(`select[data-team="${slot}"]`);
+        const cur = slot==='a'?m.team_a_id:m.team_b_id;
+        const val = sel ? (sel.value?+sel.value:null) : cur;
+        if(!val){ err(msg,"Pasukan belum lengkap."); return; }
+        patch[slot==='a'?'team_a_id':'team_b_id']=val;
+      }
+      if(patch.team_a_id===patch.team_b_id){ err(msg,"Pasukan A dan B sama."); return; }
+      const sa=card.querySelector('[data-score="a"]').value, sb_=card.querySelector('[data-score="b"]').value;
+      if(sa===""||sb_===""){ err(msg,"Isi kedua-dua skor."); return; }
+      patch.score_a=+sa; patch.score_b=+sb_;
+      if(m.round!=='group' && patch.score_a===patch.score_b){ err(msg,"Kalah mati tak boleh seri — mesti ada pemenang."); return; }
+
+      const { error } = await sb.from("matches").update(patch).eq("id",mid);
+      if(error){ err(msg,"Gagal simpan."); return; }
+
+      // AUTO-ADVANCE
+      if(m.round!=='group'){
+        const winner = patch.score_a>patch.score_b ? patch.team_a_id : patch.team_b_id;
+        const loser  = patch.score_a>patch.score_b ? patch.team_b_id : patch.team_a_id;
+        if(m.next_match_id)       await sb.from("matches").update({ [m.next_slot==='a'?'team_a_id':'team_b_id']:winner }).eq("id",m.next_match_id);
+        if(m.loser_next_match_id) await sb.from("matches").update({ [m.loser_next_slot==='a'?'team_a_id':'team_b_id']:loser  }).eq("id",m.loser_next_match_id);
+      }
+      load();
+    });
+
+    card.querySelector("[data-reopen]")?.addEventListener("click", async ()=>{
+      // clear downstream slots this match fed (only if downstream not done)
+      if(m.round!=='group'){
+        for(const [mid2,slot] of [[m.next_match_id,m.next_slot],[m.loser_next_match_id,m.loser_next_slot]]){
+          if(!mid2) continue;
+          const d = matches.find(x=>x.id===mid2);
+          if(d && d.done){ alert("Perlawanan seterusnya dah TAMAT. Buka semula perlawanan itu dulu."); return; }
+          await sb.from("matches").update({ [slot==='a'?'team_a_id':'team_b_id']:null }).eq("id",mid2);
+        }
+      }
+      await sb.from("matches").update({ done:false }).eq("id",mid); load();
+    });
+
+    card.querySelector("[data-live]")?.addEventListener("click", async ()=>{
+      const { error } = await sb.from("matches").update({ live: !m.live }).eq("id",mid);
+      if(error){ err(msg,"Gagal tukar status."); return; }
+      load();
+    });
+
+    card.querySelector("[data-delmatch]").onclick = async ()=>{
+      if(!confirm("Padam perlawanan ini?")) return;
+      await sb.from("matches").delete().eq("id",mid); load();
+    };
+  });
+}
+
+function note(sel,txt,isErr){ const el=$(sel); el.textContent=txt; el.style.color=isErr?"var(--danger)":"var(--win)"; setTimeout(()=>el.textContent="",2600); }
+function err(el,txt){ el.textContent=txt; el.style.color="var(--danger)"; }
+
+// ════════════════════════════════════════
+// JADUAL PENUH — jadual boleh edit
+// ════════════════════════════════════════
+// KUMP ikut pasukan sebenar (bukan label lama yang tersimpan)
+const KUMP_TAG = m => {
+  if(m.round==='qf')    return 'QF'+(m.bracket_pos||'');
+  if(m.round==='sf')    return 'SF'+(m.bracket_pos||'');
+  if(m.round==='final') return 'F';
+  if(m.round==='third') return '3RD';
+  const ga=teams[m.team_a_id]?.group_label, gb=teams[m.team_b_id]?.group_label;
+  if(ga&&gb) return ga===gb ? ga : `${ga}/${gb}⚠`;
+  return ga||gb||'-';
+};
+function phLabel(m,slot){
+  if(m.round==='sf'){
+    if(m.bracket_pos===1) return slot==='a'?'JOHAN A':'NAIB JOHAN B';
+    if(m.bracket_pos===2) return slot==='a'?'JOHAN B':'NAIB JOHAN A';
+  }
+  if(m.round==='final') return slot==='a'?'MENANG SF1':'MENANG SF2';
+  if(m.round==='third') return slot==='a'?'KALAH SF1':'KALAH SF2';
+  return 'Pilih pasukan';
+}
+const bySched=(a,b)=>((a.match_no||9999)-(b.match_no||9999))||(a.id-b.id);
+
+function renderSchedTable(){
+  const list=[...matches].sort(bySched);
+  if(!list.length){ $("#schedTable").innerHTML=`<div class="sub" style="padding:16px">Tiada perlawanan. Tambah di tab Kumpulan atau Kalah Mati.</div>`; return; }
+
+  const teamOpts=(sel)=>teamList.map(t=>
+    `<option value="${t.id}" ${t.id===sel?'selected':''}>${t.name}${t.group_label?` (${t.group_label}${t.seed_no||''})`:''}</option>`).join("");
+
+  const rows=list.map(m=>{
+    const fedA=m.round!=='group'&&isFed(m,'a');
+    const fedB=m.round!=='group'&&isFed(m,'b');
+    const cell=(slot,fed)=>{
+      const id=slot==='a'?m.team_a_id:m.team_b_id;
+      if(fed) return `<span class="lockcell">${nm(id)||phLabel(m,slot)}</span>`;
+      return `<select class="in-team" data-t="${slot}" ${m.done?'disabled':''}>
+        <option value="">— ${phLabel(m,slot)} —</option>${teamOpts(id)}</select>`;
+    };
+    const score = m.done
+      ? `<span class="sc-final">${m.score_a} – ${m.score_b}</span>`
+      : `<div class="sc-score">
+           <input type="number" min="0" data-s="a" value="${m.score_a??''}" placeholder="0">
+           <span class="vs-lbl">:</span>
+           <input type="number" min="0" data-s="b" value="${m.score_b??''}" placeholder="0">
+         </div>`;
+    const act = m.done
+      ? `<button class="ico" data-reopen title="Buka semula">↺</button>`
+      : `<button class="ico go" data-save title="Simpan & Tamat">✓</button>
+         <button class="ico lv ${m.live?'on':''}" data-live title="Sedang bermain">▶</button>`;
+
+    return `<tr data-mid="${m.id}" class="${m.done?'done-row':''}">
+      <td><input class="in-bil" type="number" min="1" data-f="match_no" value="${m.match_no??''}" placeholder="—"></td>
+      <td><input class="in-time" data-f="match_time" value="${m.match_time??''}" placeholder="0830"></td>
+      <td><span class="kumptag">${KUMP_TAG(m)}</span></td>
+      <td>${cell('a',fedA)}</td>
+      <td class="vs-lbl">lwn</td>
+      <td>${cell('b',fedB)}</td>
+      <td>${score}</td>
+      <td><div class="sed-act">${act}<button class="ico rm" data-del title="Padam">✕</button></div></td>
+    </tr>`;
+  }).join("");
+
+  $("#schedTable").innerHTML=`<table class="sed">
+    <thead><tr><th>BIL</th><th>MASA</th><th>KUMP</th>
+      <th colspan="3">PERLAWANAN</th><th>SKOR</th><th></th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+  bindSchedTable();
+}
+
+function bindSchedTable(){
+  document.querySelectorAll("#schedTable tr[data-mid]").forEach(tr=>{
+    const mid=+tr.dataset.mid;
+    const m=matches.find(x=>x.id===mid);
+
+    // BIL / MASA — auto simpan
+    tr.querySelectorAll("[data-f]").forEach(inp=>{
+      inp.addEventListener("change", async ()=>{
+        const f=inp.dataset.f;
+        const val = f==='match_no' ? (inp.value?+inp.value:null) : (inp.value.trim()||null);
+        const { error } = await sb.from("matches").update({ [f]: val }).eq("id",mid);
+        if(error){ note("#sc-msg","Gagal simpan.",1); return; }
+        m[f]=val; note("#sc-msg","Disimpan ✓");
+        if(f==='match_no') renderSchedTable();
+      });
+    });
+
+    // Pasukan — auto simpan
+    tr.querySelectorAll("select[data-t]").forEach(sel=>{
+      sel.addEventListener("change", async ()=>{
+        const slot=sel.dataset.t;
+        const col   = slot==='a'?'team_a_id':'team_b_id';
+        const oCol  = slot==='a'?'team_b_id':'team_a_id';
+        const val   = sel.value?+sel.value:null;
+        const patch = { [col]: val };
+
+        // Kalau pasukan sama dengan slot sebelah, kosongkan slot sebelah (bukan tolak pilihan)
+        if(val && val===m[oCol]){
+          patch[oCol]=null;
+          note("#sc-msg","Pasukan sama — slot sebelah dikosongkan.",1);
+        }
+
+        // KUMP ikut pasukan: kemas kini group_label bila kedua-dua dalam kumpulan sama
+        if(m.round==='group'){
+          const ga=teams[patch.team_a_id??m.team_a_id]?.group_label;
+          const gb=teams[patch.team_b_id!==undefined?patch.team_b_id:m.team_b_id]?.group_label;
+          if(ga&&ga===gb) patch.group_label=ga;
+        }
+
+        const { error } = await sb.from("matches").update(patch).eq("id",mid);
+        if(error){ note("#sc-msg","Gagal simpan: "+error.message,1); return; }
+        Object.assign(m,patch);
+        note("#sc-msg","Pasukan disimpan ✓");
+        renderSchedTable();   // segarkan KUMP + slot sebelah
+      });
+    });
+
+    tr.querySelector("[data-save]")?.addEventListener("click", async ()=>{
+      const a=m.team_a_id, b=m.team_b_id;
+      if(!a||!b){ note("#sc-msg","Pasukan belum lengkap.",1); return; }
+      const sa=tr.querySelector('[data-s="a"]').value, sb_=tr.querySelector('[data-s="b"]').value;
+      if(sa===""||sb_===""){ note("#sc-msg","Isi kedua-dua skor.",1); return; }
+      if(m.round!=='group'&&+sa===+sb_){ note("#sc-msg","Kalah mati tak boleh seri.",1); return; }
+      const { error } = await sb.from("matches")
+        .update({ score_a:+sa, score_b:+sb_, done:true, live:false, played_at:new Date().toISOString() }).eq("id",mid);
+      if(error){ note("#sc-msg","Gagal simpan.",1); return; }
+      if(m.round!=='group'){
+        const win = +sa>+sb_?a:b, lose = +sa>+sb_?b:a;
+        if(m.next_match_id)       await sb.from("matches").update({ [m.next_slot==='a'?'team_a_id':'team_b_id']:win  }).eq("id",m.next_match_id);
+        if(m.loser_next_match_id) await sb.from("matches").update({ [m.loser_next_slot==='a'?'team_a_id':'team_b_id']:lose }).eq("id",m.loser_next_match_id);
+      }
+      note("#sc-msg","Keputusan disimpan ✓"); load();
+    });
+
+    tr.querySelector("[data-live]")?.addEventListener("click", async ()=>{
+      await sb.from("matches").update({ live: !m.live }).eq("id",mid); load();
+    });
+    tr.querySelector("[data-reopen]")?.addEventListener("click", async ()=>{
+      for(const [id2,slot] of [[m.next_match_id,m.next_slot],[m.loser_next_match_id,m.loser_next_slot]]){
+        if(!id2) continue;
+        const d=matches.find(x=>x.id===id2);
+        if(d&&d.done){ note("#sc-msg","Perlawanan seterusnya dah tamat — buka yang itu dulu.",1); return; }
+        await sb.from("matches").update({ [slot==='a'?'team_a_id':'team_b_id']:null }).eq("id",id2);
+      }
+      await sb.from("matches").update({ done:false }).eq("id",mid); load();
+    });
+    tr.querySelector("[data-del]").addEventListener("click", async ()=>{
+      if(!confirm("Padam perlawanan ini?")) return;
+      await sb.from("matches").delete().eq("id",mid); load();
+    });
+  });
+}
+
+// Nomborkan semula BIL ikut susunan paparan sekarang
+$("#btnRenumber").onclick = async () => {
+  const list=[...matches].sort(bySched);
+  if(!list.length){ note("#sc-msg","Tiada perlawanan.",1); return; }
+  if(!confirm(`Tetapkan BIL 1 hingga ${list.length} ikut susunan sekarang?`)) return;
+  for(let i=0;i<list.length;i++) await sb.from("matches").update({ match_no:i+1 }).eq("id",list[i].id);
+  note("#sc-msg","BIL dinomborkan semula ✓"); load();
+};
+
+// Betulkan KUMP semua perlawanan kumpulan ikut pasukan sebenar
+$("#btnSyncKump").onclick = async () => {
+  const gm=matches.filter(m=>m.round==='group');
+  if(!gm.length){ note("#sc-msg","Tiada perlawanan kumpulan.",1); return; }
+  let fixed=0, mismatch=0;
+  for(const m of gm){
+    const ga=teams[m.team_a_id]?.group_label, gb=teams[m.team_b_id]?.group_label;
+    if(ga&&ga===gb){
+      if(m.group_label!==ga){ await sb.from("matches").update({group_label:ga}).eq("id",m.id); fixed++; }
+    } else if(m.team_a_id&&m.team_b_id){ mismatch++; }
+  }
+  note("#sc-msg", `${fixed} dibetulkan${mismatch?` · ${mismatch} silang kumpulan (⚠)`:''} ✓`, mismatch?1:0);
+  load();
+};
+
+// ---------- Zon Reset ----------
+// Reset skor sahaja: pasukan, BIL, MASA semua kekal.
+$("#btnResetScores").onclick = async () => {
+  const n = matches.filter(m=>m.done||m.score_a!=null||m.score_b!=null).length;
+  if(!n){ note("#rz-msg","Tiada skor untuk direset.",1); return; }
+  const c = cats.find(x=>x.id===cat)?.name || "kategori ini";
+  if(!confirm(`Reset skor ${n} perlawanan untuk ${c}?\n\nPasukan, BIL dan MASA akan KEKAL.\nTindakan ini tidak boleh dibatalkan.`)) return;
+  const { error } = await sb.from("matches")
+    .update({ score_a:null, score_b:null, done:false, live:false, played_at:null })
+    .eq("category_id",cat);
+  if(error){ note("#rz-msg","Gagal reset: "+error.message,1); return; }
+  note("#rz-msg",`Skor ${n} perlawanan direset ✓`); load();
+};
+
+// Reset pasukan kalah mati: kosongkan SF / Akhir / Tempat Ke-3 (+ QF kalau ada).
+$("#btnResetKO").onclick = async () => {
+  const ko = matches.filter(m=>m.round!=='group');
+  if(!ko.length){ note("#rz-msg","Tiada perlawanan kalah mati.",1); return; }
+  const c = cats.find(x=>x.id===cat)?.name || "kategori ini";
+  if(!confirm(`Kosongkan pasukan & skor untuk ${ko.length} perlawanan kalah mati (${c})?\n\nStruktur bracket dan pautan auto-naik akan KEKAL — hanya nama pasukan dan skor dibuang.`)) return;
+  const { error } = await sb.from("matches")
+    .update({ team_a_id:null, team_b_id:null, score_a:null, score_b:null, done:false, live:false, played_at:null })
+    .eq("category_id",cat).neq("round","group");
+  if(error){ note("#rz-msg","Gagal reset: "+error.message,1); return; }
+  note("#rz-msg",`${ko.length} perlawanan kalah mati dikosongkan ✓`); load();
+};
+
+// Tarikh pertandingan kategori
+$("#catDate").onchange = async (e) => {
+  const val = e.target.value || null;
+  const { error } = await sb.from("categories").update({ event_date: val }).eq("id",cat);
+  if(error){ note("#cd-msg","Gagal simpan: "+error.message,1); return; }
+  const { data } = await sb.from("categories").select("*").order("sort_order");
+  cats = data||[];
+  note("#cd-msg", val?"Tarikh disimpan ✓":"Tarikh dikosongkan ✓");
+  tabs(); renderCatBanner();
+};
+
+boot();
+</script>
+</body>
+</html>

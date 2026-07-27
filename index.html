@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MSSPP Bola Baling 2026 — Keputusan</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MSSPP Bola Baling 2026">
+<meta property="og:title" content="Kejohanan Bola Baling MSSPP 2026">
+<meta property="og:description" content="Keputusan rasmi, kedudukan kumpulan & bracket — Peringkat Negeri Pulau Pinang.">
+<meta property="og:url" content="https://msspp.pages.dev/">
+<meta property="og:image" content="https://msspp.pages.dev/og.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://msspp.pages.dev/og.png?v=1">
+<link rel="icon" href="msspp-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#2C5CA8;--blueDark:#1B4079;--blueSoft:#E8EEF8;
+    --yellow:#F2DE1B;--ink:#152238;--muted:#6B7A94;
+    --bg:#F2F5FA;--card:#fff;--line:#D9E1EE;--win:#1B7A4A;--gold:#B98A1E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+  /* ── HERO ── */
+  .hero{background:linear-gradient(160deg,var(--blueDark) 0%,var(--blue) 100%);color:#fff;position:relative;padding:22px 16px 36px}
+  .hero-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  .hero img{width:56px;height:56px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3))}
+  .eyebrow{font-family:Archivo;font-weight:700;font-size:11px;letter-spacing:.16em;color:var(--yellow);text-transform:uppercase}
+  h1{font-family:Archivo;font-weight:800;font-size:22px;line-height:1.15;margin-top:3px}
+  .wave{position:absolute;left:0;right:0;bottom:-1px;line-height:0}
+  .wave svg{display:block;width:100%;height:22px}
+
+  .wrap{max-width:860px;margin:0 auto;padding:0 16px 70px}
+
+  /* ── TABS ── */
+  .tabs,.views{display:flex;gap:8px;overflow-x:auto;padding:16px 0 4px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar,.views::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;font-family:Archivo;font-weight:700;font-size:13px;
+       color:var(--blueDark);background:var(--card);border:1px solid var(--line);
+       padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:.15s}
+  .tab.on{background:var(--yellow);border-color:var(--yellow)}
+  .views .tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+  .section{font-family:Archivo;font-weight:700;font-size:11px;letter-spacing:.14em;
+           color:var(--muted);text-transform:uppercase;margin:20px 0 10px}
+
+  /* ── RESULT CARDS ── */
+  .rcard{background:var(--card);border:1px solid var(--line);border-radius:12px;
+         padding:4px 14px;margin-bottom:10px;border-left:4px solid var(--blue)}
+  .rmeta{font-size:11px;color:var(--muted);padding:10px 0 4px}
+  .rrow{display:grid;grid-template-columns:1fr 44px;align-items:center;padding:7px 0;font-size:14px}
+  .rrow.first{border-bottom:1px dashed var(--line)}
+  .rrow:last-child{padding-bottom:12px}
+  .winner .rname{font-weight:700;color:var(--blueDark)}
+  .winner .rscore{color:var(--blue)}
+  .winner .rname::after{content:" ◂";color:var(--blue);font-size:12px}
+  .rscore{font-family:Archivo;font-weight:800;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+  .pending{color:var(--muted);font-style:italic}
+
+  /* ── GROUP GRID (Image 1 style) ── */
+  .group-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:8px}
+  .grp-box{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .grp-hdr{background:var(--blue);color:#fff;font-family:Archivo;font-weight:800;
+           font-size:13px;padding:9px 14px;letter-spacing:.04em}
+  .grp-team{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--blueSoft);font-size:13.5px}
+  .grp-team:last-child{border-bottom:none}
+  .grp-seed{font-family:Archivo;font-weight:800;font-size:11px;color:var(--muted);width:18px}
+
+  /* ── ROUND-ROBIN MATRIX (Image 2 style) ── */
+  .matrix-wrap{overflow-x:auto;margin-bottom:16px}
+  .rr-title{font-family:Archivo;font-weight:800;font-size:13px;
+            background:var(--blue);color:#fff;display:inline-block;
+            padding:5px 14px;border-radius:8px 8px 0 0}
+  table.matrix{border-collapse:collapse;min-width:100%}
+  table.matrix th,table.matrix td{border:1px solid var(--line);padding:0;text-align:center;font-size:12.5px}
+  table.matrix thead th{background:var(--blueSoft);color:var(--blueDark);
+                        font-family:Archivo;font-weight:700;font-size:11px;
+                        letter-spacing:.04em;padding:8px 10px;white-space:nowrap}
+  table.matrix thead th.corner{background:transparent;border:none}
+  table.matrix thead th.team-hdr{min-width:80px}
+  table.matrix .row-lbl{background:var(--blueSoft);font-family:Archivo;font-weight:700;
+                        font-size:12px;color:var(--blueDark);padding:6px 12px;text-align:left;white-space:nowrap}
+  table.matrix .self{background:#F0F3F8}
+  table.matrix .cell-match{padding:8px 10px;min-width:64px}
+  table.matrix .cell-match.won{background:var(--blueSoft)}
+  .cell-sc{display:flex;justify-content:center;align-items:center;gap:8px;
+           font-family:Archivo;font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}
+  .cell-match.won .cell-sc{color:var(--blue)}
+  .cell-sc .div{color:var(--muted);font-weight:400;font-size:13px}
+  .cell-pt{font-size:11px;color:var(--muted);margin-top:2px}
+  .cell-match.won .cell-pt{color:var(--blueDark);font-weight:600}
+  /* stats columns */
+  table.matrix .stat{padding:8px 10px;font-family:Archivo;font-weight:700;font-variant-numeric:tabular-nums;font-size:13px}
+  table.matrix .stat.pts{color:var(--blueDark);font-size:14px}
+  table.matrix .rank-row:nth-child(-n+2) .row-lbl{color:var(--win)}
+
+  /* ── BRACKET ── */
+  .bracket{display:flex;gap:0;overflow-x:auto;padding:10px 2px 18px}
+  .bcol{display:flex;flex-direction:column;justify-content:space-around;gap:16px;min-width:175px}
+  .bcol h4{font-family:Archivo;font-weight:800;font-size:11px;letter-spacing:.12em;
+           color:var(--blueDark);text-transform:uppercase;margin:0 0 6px;text-align:center}
+  .bjoin{width:24px;flex:0 0 24px;display:flex;flex-direction:column}
+  .bjoin .lk{flex:1;position:relative}
+  .bjoin .lk::before{content:"";position:absolute;right:0;top:0;bottom:0;width:2px;background:var(--line)}
+  .bjoin .lk.top::after{content:"";position:absolute;right:0;bottom:0;width:100%;height:2px;background:var(--line)}
+  .bjoin .lk.bot::after{content:"";position:absolute;right:0;top:0;width:100%;height:2px;background:var(--line)}
+  .bjoin .mid{height:2px;background:var(--line);width:100%}
+  .bm{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:8px}
+  .bm:last-child{margin-bottom:0}
+  .bm.final-match{border:2px solid var(--yellow);box-shadow:0 2px 12px rgba(242,222,27,.3)}
+  .bt{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;font-size:13px;gap:6px}
+  .bt+.bt{border-top:1px solid var(--line)}
+  .bt .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+  .bt .s{font-family:Archivo;font-weight:800;font-variant-numeric:tabular-nums;color:var(--muted);min-width:20px;text-align:right}
+  .bt.w{background:var(--blueSoft)}
+  .bt.w .n{font-weight:700;color:var(--blueDark)}
+  .bt.w .s{color:var(--blue)}
+  .tbd{color:var(--muted);font-style:italic}
+  .champ{text-align:center;font-family:Archivo;font-weight:800;font-size:13px;color:var(--gold);padding:8px 0 2px}
+
+  .empty{color:var(--muted);font-size:13px;padding:20px 0;text-align:center}
+
+  /* ── JADUAL (official schedule table) ── */
+  .sched-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-top:4px}
+  table.sched{border-collapse:collapse;width:100%;min-width:560px}
+  table.sched thead th{background:var(--blue);color:#fff;font-family:Archivo;font-weight:700;
+    font-size:10.5px;letter-spacing:.06em;padding:9px 8px;text-align:center;white-space:nowrap}
+  table.sched td{border-bottom:1px solid var(--blueSoft);padding:9px 8px;font-size:13px;text-align:center}
+  table.sched tr:last-child td{border-bottom:none}
+  table.sched .c-bil{font-family:Archivo;font-weight:800;color:var(--muted);width:34px}
+  table.sched .c-time{font-family:Archivo;font-weight:700;font-variant-numeric:tabular-nums;width:56px}
+  table.sched .c-kump{width:42px}
+  .kump-tag{font-family:Archivo;font-weight:800;font-size:10.5px;background:var(--blueSoft);
+    color:var(--blueDark);padding:3px 7px;border-radius:5px}
+  table.sched .c-team{text-align:left;font-weight:600;min-width:118px}
+  .tcell{display:flex;align-items:center;gap:6px;min-width:0}
+  .tcell.right{justify-content:flex-end;text-align:right}
+  .tcell .tn{min-width:0;line-height:1.28;overflow-wrap:anywhere}
+  .seed-tag{flex:0 0 auto;font-family:Archivo;font-weight:800;font-size:9.5px;color:var(--muted);
+    background:#EEF2F8;padding:2px 5px;border-radius:4px;margin:0}
+  .team-ph{color:var(--muted);font-style:italic;font-weight:400}
+  .c-vs{color:var(--muted);font-size:11px;width:24px}
+
+  /* Skrin kecil — rapatkan supaya muat */
+  @media (max-width:520px){
+    table.sched{min-width:0;width:100%}
+    table.sched thead th{font-size:9.5px;padding:8px 4px}
+    table.sched td{padding:8px 4px;font-size:12px}
+    table.sched .c-team{min-width:96px}
+    .tcell{gap:4px}
+    .seed-tag{font-size:8.5px;padding:2px 4px}
+    .c-vs{width:16px;font-size:9.5px}
+    table.sched .c-bil{width:26px}
+    table.sched .c-time{width:46px;font-size:11px}
+    table.sched .c-res{width:80px}
+    .res-score{font-size:13px}
+    .badge-live{font-size:8px;padding:3px 6px}
+  }
+  table.sched .c-res{width:104px;white-space:nowrap}
+  .res-score{font-family:Archivo;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;color:var(--blueDark)}
+  .res-none{color:var(--muted);font-size:12px}
+  .badge-live{display:inline-flex;align-items:center;gap:5px;background:#E11D48;color:#fff;
+    font-family:Archivo;font-weight:800;font-size:9.5px;letter-spacing:.06em;
+    padding:4px 8px;border-radius:999px;white-space:nowrap}
+  .badge-live .dot{width:5px;height:5px;border-radius:50%;background:#fff;animation:blink 1.2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  tr.is-live td{background:#FFF1F3}
+  tr.is-done td{background:#FAFBFD}
+  tr.is-done .c-team{color:var(--muted)}
+  tr.is-done .c-team.won{color:var(--blueDark);font-weight:700}
+  .sched-note{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+
+  /* ── KEDUDUKAN MATA MENGIKUT ZON ── */
+  .zon-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-top:4px}
+  table.zon{border-collapse:collapse;width:100%}
+  table.zon thead th{background:var(--blue);color:#fff;font-family:Archivo;font-weight:700;
+    font-size:11px;letter-spacing:.06em;padding:10px 8px;text-align:center}
+  table.zon td{border-bottom:1px solid var(--blueSoft);padding:10px 8px;font-size:13.5px;text-align:center}
+  table.zon tr:last-child td{border-bottom:none}
+  table.zon .zn-rank{font-family:Archivo;font-weight:800;color:var(--muted);width:50px}
+  table.zon tbody tr:nth-child(-n+3) .zn-rank{color:var(--gold)}
+  table.zon .zn-name{text-align:left;font-weight:700;color:var(--blueDark)}
+  table.zon .zn-pts{font-family:Archivo;font-weight:800;color:var(--blueDark);font-size:15px}
+
+  /* Tab badges + date bar */
+  .tab.has-live{border-color:#F5C2CB;background:#FFF1F3}
+  .tb-live{display:inline-flex;align-items:center;gap:4px;font-family:Archivo;font-weight:800;
+    font-size:8.5px;letter-spacing:.06em;background:#E11D48;color:#fff;
+    padding:2px 6px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .tb-dot{width:4px;height:4px;border-radius:50%;background:#fff;animation:blink 1.2s infinite}
+  .tb-today{font-family:Archivo;font-weight:800;font-size:8.5px;letter-spacing:.06em;
+    background:var(--blueDark);color:#fff;padding:2px 6px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .tb-done{font-family:Archivo;font-weight:800;font-size:8.5px;letter-spacing:.06em;
+    background:#E4E9F1;color:var(--muted);padding:2px 6px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .date-bar{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:9px 14px;font-size:12.5px;color:var(--muted);margin-bottom:8px;font-weight:500}
+  .date-bar.on{background:#FFF1F3;border-color:#F5C2CB;color:var(--ink)}
+  .dbt{font-family:Archivo;font-weight:800;font-size:9px;letter-spacing:.06em;
+    background:#E11D48;color:#fff;padding:2px 7px;border-radius:999px;margin-left:6px}
+  .hidden{display:none}
+  footer{color:var(--muted);font-size:11px;text-align:center;margin-top:28px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <img src="msspp-logo.png" alt="MSSPP" id="logo" style="cursor:pointer">
+    <div>
+      <div class="eyebrow">Keputusan Rasmi · Bola Baling</div>
+      <h1>MSSPP Peringkat Negeri 2026</h1>
+    </div>
+  </div>
+  <div class="wave"><svg viewBox="0 0 800 22" preserveAspectRatio="none">
+    <path d="M0,14 C100,4 200,24 300,14 C400,4 500,24 600,14 C700,4 800,22 800,14 L800,22 L0,22 Z" fill="#F2F5FA"/>
+  </svg></div>
+</div>
+
+<div class="wrap">
+  <!-- Category tabs -->
+  <div class="tabs" id="tabs"></div>
+
+  <!-- View tabs -->
+  <div class="views">
+    <div class="tab on" data-view="schedule">Jadual</div>
+    <div class="tab" data-view="groups">Kumpulan</div>
+    <div class="tab" data-view="matrix">Jadual Mata</div>
+    <div class="tab" data-view="bracket">Bracket</div>
+    <div class="tab" data-view="zon">Zon</div>
+  </div>
+
+  <!-- Views -->
+  <div id="v-schedule"></div>
+  <div id="v-groups" class="hidden"></div>
+  <div id="v-matrix" class="hidden"></div>
+  <div id="v-bracket" class="hidden"></div>
+  <div id="v-zon" class="hidden"></div>
+  <div id="v-results" class="hidden"></div>
+
+  <footer>Majlis Sukan Sekolah Pulau Pinang · Bola Baling 2026</footer>
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+const $ = s => document.querySelector(s);
+const ROUND = {qf:"Suku Akhir",sf:"Separuh Akhir",third:"Tempat Ke-3",final:"Akhir"};
+
+let cats=[], cat=null, teams={}, teamList=[], matches=[], allMatches=[];
+
+// ── view switching ──
+document.querySelectorAll(".views .tab").forEach(el=>el.onclick=()=>{
+  document.querySelectorAll(".views .tab").forEach(t=>t.classList.remove("on"));
+  el.classList.add("on");
+  ["schedule","groups","matrix","bracket","zon","results"].forEach(v=>
+    $("#v-"+v).classList.toggle("hidden", v!==el.dataset.view));
+});
+
+// ── boot ──
+async function boot(){
+  const { data } = await sb.from("categories").select("*").order("sort_order");
+  cats=data||[];
+  await loadAll();
+  // Auto-pilih kategori yang berlangsung hari ini
+  const today=todayStr();
+  const running = cats.find(c=>c.event_date===today);
+  if(!cat) cat = (running||cats[0])?.id || null;
+  renderTabs(); if(cat) load();
+}
+
+// Data ringan untuk semua kategori — untuk penanda pada tab
+async function loadAll(){
+  const { data } = await sb.from("matches")
+    .select("id,category_id,match_no,match_time,done,live");
+  allMatches = data||[];
+}
+
+// Status setiap kategori: berlangsung hari ini? ada perlawanan sedang bermain?
+function catStatus(c){
+  const today = todayStr();
+  const isToday = c.event_date===today;
+  const list = allMatches.filter(m=>m.category_id===c.id)
+    .sort((a,b)=>((a.match_no||9999)-(b.match_no||9999))||(a.id-b.id));
+  const liveCount = computeLive(list, c.event_date).size;
+  const allDone = list.length>0 && list.every(m=>m.done);
+  return { isToday, liveCount, allDone };
+}
+
+function renderTabs(){
+  $("#tabs").innerHTML=cats.map(c=>{
+    const s=catStatus(c);
+    let badge="";
+    if(s.liveCount)      badge=`<span class="tb-live"><span class="tb-dot"></span>LANGSUNG</span>`;
+    else if(s.isToday)   badge=`<span class="tb-today">HARI INI</span>`;
+    else if(s.allDone)   badge=`<span class="tb-done">TAMAT</span>`;
+    return `<div class="tab ${c.id===cat?'on':''} ${s.liveCount?'has-live':''}" data-id="${c.id}">${c.name}${badge}</div>`;
+  }).join("");
+  $("#tabs").querySelectorAll(".tab").forEach(el=>el.onclick=()=>{cat=+el.dataset.id;renderTabs();load();});
+}
+async function load(){
+  const [{data:tm},{data:mt}]=await Promise.all([
+    sb.from("teams").select("*").eq("category_id",cat)
+      .order("group_label",{nullsFirst:false}).order("seed_no",{nullsFirst:false}).order("name"),
+    sb.from("matches").select("*").eq("category_id",cat).order("id"),
+  ]);
+  teamList=tm||[]; teams=Object.fromEntries(teamList.map(t=>[t.id,t])); matches=mt||[];
+  renderSchedule(); renderGroups(); renderResults(); renderMatrix(); renderBracket();
+}
+const nm=id=>teams[id]?.name||null;
+
+// ════════════════════════════════════════
+// 0. JADUAL — macam jadual rasmi
+// ════════════════════════════════════════
+const KUMP_TAG = m => {
+  if(m.round==='qf')    return 'QF'+(m.bracket_pos||'');
+  if(m.round==='sf')    return 'SF'+(m.bracket_pos||'');
+  if(m.round==='final') return 'F';
+  if(m.round==='third') return '3RD';
+  const ga=teams[m.team_a_id]?.group_label, gb=teams[m.team_b_id]?.group_label;
+  if(ga&&gb&&ga===gb) return ga;
+  return ga||gb||m.group_label||'-';
+};
+
+// Label sementara bila pasukan belum ditetapkan (ikut jadual rasmi)
+function placeholder(m,slot){
+  if(m.round==='sf'){
+    if(m.bracket_pos===1) return slot==='a'?'JOHAN A':'NAIB JOHAN B';
+    if(m.bracket_pos===2) return slot==='a'?'JOHAN B':'NAIB JOHAN A';
+    return 'MENUNGGU';
+  }
+  if(m.round==='final') return slot==='a'?'MENANG SF1':'MENANG SF2';
+  if(m.round==='third') return slot==='a'?'KALAH SF1':'KALAH SF2';
+  return 'MENUNGGU';
+}
+function seedOf(id){
+  const t=teams[id]; if(!t||!t.group_label||!t.seed_no) return '';
+  return t.group_label+t.seed_no;
+}
+// "0830" / "08:30" → Date hari ini
+function parseTime(t){
+  if(!t) return null;
+  const s=String(t).replace(/\D/g,'');
+  if(s.length<3) return null;
+  const hh=+s.slice(0,s.length-2), mm=+s.slice(-2);
+  if(isNaN(hh)||isNaN(mm)||hh>23||mm>59) return null;
+  const d=new Date(); d.setHours(hh,mm,0,0); return d;
+}
+const todayStr = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD tempatan
+
+// Perlawanan yang "sedang bermain".
+// Auto ikut jam HANYA pada tarikh kategori itu. Penanda manual (live) sentiasa berkuat kuasa.
+function computeLive(list, eventDate){
+  const dateOk = !eventDate || eventDate===todayStr();
+  const now=new Date();
+  const starts=list.map(m=>parseTime(m.match_time));
+  const set=new Set();
+  list.forEach((m,i)=>{
+    if(m.done) return;
+    if(m.live){ set.add(m.id); return; }
+    if(!dateOk) return;
+    const start=starts[i]; if(!start) return;
+    let end=null;
+    for(let j=i+1;j<list.length;j++){ if(starts[j]){ end=starts[j]; break; } }
+    if(!end) end=new Date(start.getTime()+30*60000);
+    if(now>=start && now<end) set.add(m.id);
+  });
+  return set;
+}
+
+function renderSchedule(){
+  const bySched=(a,b)=>((a.match_no||9999)-(b.match_no||9999))||(a.id-b.id);
+  const list=[...matches].sort(bySched);
+  if(!list.length){ $("#v-schedule").innerHTML=`<div class="empty">Jadual belum dimasukkan.</div>`; return; }
+
+  const c = cats.find(x=>x.id===cat);
+  const liveSet = computeLive(list, c?.event_date);
+
+  const rows=list.map(m=>{
+    const isLive = liveSet.has(m.id);
+
+    const aName=nm(m.team_a_id), bName=nm(m.team_b_id);
+    const aW=m.done&&m.score_a>m.score_b, bW=m.done&&m.score_b>m.score_a;
+
+    const teamCell=(name,ph,seed,won,right)=>{
+      const label = name
+        ? `<span class="tn">${name}</span>`
+        : `<span class="tn team-ph">${ph}</span>`;
+      const sd = seed?`<span class="seed-tag">${seed}</span>`:'';
+      return `<td class="c-team ${won?'won':''}">
+        <div class="tcell ${right?'right':''}">${right?label+sd:sd+label}</div></td>`;
+    };
+
+    const result = m.done
+      ? `<span class="res-score">${m.score_a} – ${m.score_b}</span>`
+      : isLive
+        ? `<span class="badge-live"><span class="dot"></span>SEDANG BERMAIN</span>`
+        : `<span class="res-none">—</span>`;
+
+    return `<tr class="${isLive?'is-live':''} ${m.done?'is-done':''}">
+      <td class="c-bil">${m.match_no??'-'}</td>
+      <td class="c-time">${m.match_time||'-'}</td>
+      <td class="c-kump"><span class="kump-tag">${KUMP_TAG(m)}</span></td>
+      ${teamCell(aName,placeholder(m,'a'),seedOf(m.team_a_id),aW,false)}
+      <td class="c-vs">lwn</td>
+      ${teamCell(bName,placeholder(m,'b'),seedOf(m.team_b_id),bW,true)}
+      <td class="c-res">${result}</td>
+    </tr>`;
+  }).join("");
+
+  const dateLine = c?.event_date
+    ? (()=> {
+        const d=new Date(c.event_date+"T00:00:00");
+        const txt=d.toLocaleDateString('ms-MY',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+        const isToday = c.event_date===todayStr();
+        return `<div class="date-bar ${isToday?'on':''}">📅 ${txt}${isToday?' <span class="dbt">HARI INI</span>':''}</div>`;
+      })()
+    : "";
+
+  $("#v-schedule").innerHTML=`${dateLine}
+    <div class="sched-wrap"><table class="sched">
+      <thead><tr>
+        <th>BIL</th><th>MASA</th><th>KUMP</th>
+        <th colspan="3">PERLAWANAN</th><th>KEPUTUSAN</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <div class="sched-note">*Jadual adalah tertakluk kepada pindaan semasa hari pertandingan.</div>`;
+}
+
+// ════════════════════════════════════════
+// 1. GROUP GRID — macam Image 1
+// ════════════════════════════════════════
+function renderGroups(){
+  const grouped={};
+  teamList.forEach(t=>{ if(t.group_label)(grouped[t.group_label]||=[]).push(t); });
+  const labels=Object.keys(grouped).sort();
+  if(!labels.length){ $("#v-groups").innerHTML=`<div class="empty">Pasukan belum ditetapkan kumpulan.</div>`; return; }
+  const bySeed=(a,b)=>((a.seed_no||99)-(b.seed_no||99))||a.name.localeCompare(b.name);
+  $("#v-groups").innerHTML=`<div class="group-grid">${
+    labels.map(g=>`<div class="grp-box">
+      <div class="grp-hdr">KUMPULAN ${g}</div>
+      ${[...grouped[g]].sort(bySeed).map(t=>`<div class="grp-team">
+        <span class="grp-seed">${g}${t.seed_no||'?'}</span>${t.name}
+      </div>`).join("")}
+    </div>`).join("")
+  }</div>`;
+}
+
+// ════════════════════════════════════════
+// 2. RESULTS — FIFA card style
+// ════════════════════════════════════════
+function renderResults(){
+  const bySched=(a,b)=>((a.match_no||9999)-(b.match_no||9999))||(a.id-b.id);
+  const done=matches.filter(m=>m.done).sort(bySched);
+  const upcoming=matches.filter(m=>!m.done&&m.team_a_id&&m.team_b_id).sort(bySched);
+  let html="";
+  if(done.length) html+=`<div class="section">Selesai</div>`+done.map(rc).join("");
+  if(upcoming.length) html+=`<div class="section">Belum Bermain</div>`+upcoming.map(rc).join("");
+  $("#v-results").innerHTML=html||`<div class="empty">Belum ada perlawanan.</div>`;
+}
+function rc(m){
+  const label=m.round==='group'?`Kumpulan ${m.group_label||''}`:ROUND[m.round]||m.round;
+  const sched=[m.match_no?`BIL ${m.match_no}`:'', m.match_time||''].filter(Boolean).join(' · ');
+  const aW=m.done&&m.score_a>m.score_b, bW=m.done&&m.score_b>m.score_a;
+  return `<div class="rcard">
+    <div class="rmeta">${sched?sched+' — ':''}${label}${m.done?'':' · <span class="pending">belum bermain</span>'}</div>
+    <div class="rrow first ${aW?'winner':''}"><span class="rname">${nm(m.team_a_id)||'—'}</span><span class="rscore">${m.done?m.score_a:''}</span></div>
+    <div class="rrow ${bW?'winner':''}"><span class="rname">${nm(m.team_b_id)||'—'}</span><span class="rscore">${m.done?m.score_b:''}</span></div>
+  </div>`;
+}
+
+// ════════════════════════════════════════
+// 3. ROUND-ROBIN MATRIX — macam Image 2
+//    Rows & cols = teams in same group
+//    Cell = mini score card
+//    Right = JRGN / KENA / DFST / MATA / KEDUDUKAN
+// ════════════════════════════════════════
+function renderMatrix(){
+  const grouped={};
+  teamList.forEach(t=>{ if(t.group_label)(grouped[t.group_label]||=[]).push(t); });
+  const labels=Object.keys(grouped).sort();
+  if(!labels.length){ $("#v-matrix").innerHTML=`<div class="empty">Pasukan belum ditetapkan kumpulan.</div>`; return; }
+
+  const groupMatches=matches.filter(m=>m.round==='group');
+
+  // Dedupe: ONE match per unordered pair (avoids duplicate-generate inflation).
+  // Whatever match shows in the cell is exactly what counts in JRGN/KENA/MATA.
+  const pairKey=(x,y)=>[Math.min(x,y),Math.max(x,y)].join("-");
+  const pairMatch=new Map();
+  groupMatches.forEach(m=>{
+    if(!m.team_a_id||!m.team_b_id) return;
+    const k=pairKey(m.team_a_id,m.team_b_id);
+    const cur=pairMatch.get(k);
+    // prefer a completed match; otherwise keep the latest id
+    if(!cur || (m.done && !cur.done) || (m.done===cur.done && m.id>cur.id)) pairMatch.set(k,m);
+  });
+  const getMatch=(x,y)=>pairMatch.get(pairKey(x,y));
+
+  // stats per team (from deduped matches only)
+  const stats={};
+  teamList.forEach(t=>{stats[t.id]={gf:0,ga:0,pts:0,w:0,d:0,l:0}});
+  pairMatch.forEach(m=>{
+    if(!m.done) return;
+    const {team_a_id:a,team_b_id:b,score_a:sa,score_b:sb_}=m;
+    if(!stats[a]||!stats[b]) return;
+    // Only count matches between teams CURRENTLY in the same group.
+    // Ignores stale matches left over after teams were moved between groups.
+    const ga=teams[a]?.group_label, gb=teams[b]?.group_label;
+    if(!ga || ga!==gb) return;
+    stats[a].gf+=sa; stats[a].ga+=sb_;
+    stats[b].gf+=sb_; stats[b].ga+=sa;
+    if(sa>sb_){stats[a].pts+=3;stats[a].w++;stats[b].l++;}
+    else if(sa===sb_){stats[a].pts+=1;stats[a].d++;stats[b].pts+=1;stats[b].d++;}
+    else{stats[b].pts+=3;stats[b].w++;stats[a].l++;}
+  });
+
+  // Ranking (peraturan MSSPP): MATA → DFST → JRGN → head-to-head
+  const cmp=(a,b)=>{
+    const sa=stats[a.id], sb=stats[b.id];
+    if(sb.pts!==sa.pts) return sb.pts-sa.pts;                 // mata
+    const gda=sa.gf-sa.ga, gdb=sb.gf-sb.ga;
+    if(gdb!==gda) return gdb-gda;                             // 5.2.1 DFST
+    if(sb.gf!==sa.gf) return sb.gf-sa.gf;                     // 5.2.2 JRGN
+    const h=getMatch(a.id,b.id);                              // 5.2.3 head-to-head
+    if(h&&h.done){
+      const aSc=h.team_a_id===a.id?h.score_a:h.score_b;
+      const bSc=h.team_a_id===a.id?h.score_b:h.score_a;
+      if(aSc>bSc) return -1; if(bSc>aSc) return 1;
+    }
+    return 0;                                                 // 5.2.4 lambung syiling — manual
+  };
+
+  let html="";
+  for(const g of labels){
+    const gt=grouped[g];
+    const sorted=[...gt].sort(cmp);
+
+    const cols=sorted.map(t=>`<th class="team-hdr">${t.name}</th>`).join("");
+    const rows=sorted.map((row,ri)=>{
+      const s=stats[row.id]||{gf:0,ga:0,pts:0};
+      const cells=sorted.map(col=>{
+        if(row.id===col.id) return `<td class="self"></td>`;
+        const m=getMatch(row.id,col.id);
+        if(!m||!m.done) return `<td></td>`;
+        // from row's perspective
+        const myScore=m.team_a_id===row.id?m.score_a:m.score_b;
+        const opScore=m.team_a_id===row.id?m.score_b:m.score_a;
+        const won=myScore>opScore, draw=myScore===opScore;
+        const pts=won?3:draw?1:0;
+        return `<td class="cell-match ${won?'won':''}">
+          <div class="cell-sc"><span>${myScore}</span><span class="div">|</span><span>${opScore}</span></div>
+          <div class="cell-pt">(${pts})</div>
+        </td>`;
+      }).join("");
+      return `<tr class="rank-row">
+        <td class="row-lbl">${ri+1}. ${row.name}</td>
+        ${cells}
+        <td class="stat">${s.gf}</td>
+        <td class="stat">${s.ga}</td>
+        <td class="stat">${s.gf-s.ga>0?'+':''}${s.gf-s.ga}</td>
+        <td class="stat pts">${s.pts}</td>
+        <td class="stat">${ri+1}</td>
+      </tr>`;
+    }).join("");
+
+    html+=`<div class="matrix-wrap">
+      <div class="rr-title">Kumpulan ${g}</div>
+      <table class="matrix">
+        <thead><tr>
+          <th class="corner"></th>${cols}
+          <th>JRGN</th><th>KENA</th><th>DFST</th><th>MATA</th><th>KEDUDUKAN</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }
+  $("#v-matrix").innerHTML=html;
+}
+
+// ════════════════════════════════════════
+// 4. BRACKET — connector lines
+// ════════════════════════════════════════
+function renderBracket(){
+  const ko=r=>matches.filter(m=>m.round===r).sort((a,b)=>(a.bracket_pos||0)-(b.bracket_pos||0)||a.id-b.id);
+  const qf=ko('qf'),sf=ko('sf'),th=ko('third'),fi=ko('final');
+  if(!qf.length&&!sf.length&&!fi.length){
+    $("#v-bracket").innerHTML=`<div class="empty">Bracket belum dibuka.</div>`; return;
+  }
+  const champ=fi[0]?.done?(fi[0].score_a>fi[0].score_b?nm(fi[0].team_a_id):nm(fi[0].team_b_id)):null;
+
+  const bCol=(title,list)=>list.length?`<div class="bcol"><h4>${title}</h4>${list.map(m=>bmCard(m)).join("")}</div>`:"";
+
+  // connector join column between two rounds
+  const joinCol=(leftCount)=>{
+    // pair every 2 left matches → 1 right match
+    const pairs=Math.ceil(leftCount/2);
+    const segs=Array.from({length:pairs},(_,i)=>
+      `<div style="flex:1;display:flex;flex-direction:column">
+        <div class="lk top" style="flex:1;position:relative;border-right:2px solid var(--line)">
+          <div style="position:absolute;right:0;bottom:0;width:24px;height:2px;background:var(--line)"></div>
+        </div>
+        <div class="lk bot" style="flex:1;position:relative;border-right:2px solid var(--line)">
+          <div style="position:absolute;right:0;top:0;width:24px;height:2px;background:var(--line)"></div>
+        </div>
+      </div>`).join("");
+    return `<div style="width:24px;display:flex;flex-direction:column;gap:16px;padding-top:26px">${segs}</div>`;
+  };
+
+  $("#v-bracket").innerHTML=`<div class="bracket">
+    ${bCol("Suku Akhir",qf)}
+    ${qf.length?joinCol(qf.length):""}
+    ${bCol("Separuh Akhir",sf)}
+    ${sf.length?joinCol(sf.length):""}
+    <div class="bcol">
+      <h4>Akhir</h4>
+      ${fi.map(m=>bmCard(m,true)).join("")}
+      ${champ?`<div class="champ">🏆 Johan: ${champ}</div>`:""}
+      ${th.length?`<h4 style="margin-top:16px">Tempat Ke-3</h4>${th.map(m=>bmCard(m)).join("")}`:""}
+    </div>
+  </div>`;
+}
+function bmCard(m,isFinal=false){
+  const aW=m.done&&m.score_a>m.score_b, bW=m.done&&m.score_b>m.score_a;
+  const row=(id,s,w)=>`<div class="bt ${w?'w':''}">
+    <span class="n ${id?'':'tbd'}">${nm(id)||'Menunggu…'}</span>
+    <span class="s">${m.done?s:''}</span></div>`;
+  return `<div class="bm ${isFinal?'final-match':''}">${row(m.team_a_id,m.score_a,aW)}${row(m.team_b_id,m.score_b,bW)}</div>`;
+}
+
+// ════════════════════════════════════════
+// 5. KEDUDUKAN MATA MENGIKUT ZON
+//    Jumlah mata setiap zon (nama pasukan) merentasi SEMUA kategori.
+//    Kedudukan (Johan/Naib Johan/Ketiga Bersama/Ke-5...Ke-9) ditetapkan
+//    SECARA MANUAL oleh admin (admin.html) — tiada kiraan automatik.
+//    Johan=25, Naib Johan=18, Ketiga Bersama=13,
+//    Ke-5=5, Ke-6=4, Ke-7=3, Ke-8=2, Ke-9=1
+// ════════════════════════════════════════
+const ZONE_POINTS = {1:25,2:18,3:13,5:5,6:4,7:3,8:2,9:1};
+
+async function loadZoneData(){
+  const { data, error } = await sb.from("teams").select("name,manual_rank");
+  if(error) console.error("loadZoneData teams:", error.message);
+  return { teams: data||[], error };
+}
+
+async function renderZon(){
+  const {teams:allTeams, error} = await loadZoneData();
+  if(error){ $("#v-zon").innerHTML=`<div class="empty">Ralat memuatkan data zon: ${error.message}</div>`; return; }
+
+  const zoneTotals={};
+  allTeams.forEach(t=>{
+    if(!t.manual_rank || !t.name) return;
+    zoneTotals[t.name]=(zoneTotals[t.name]||0)+(ZONE_POINTS[t.manual_rank]||0);
+  });
+
+  const rows=Object.entries(zoneTotals).sort((a,b)=>b[1]-a[1]);
+  if(!rows.length){ $("#v-zon").innerHTML=`<div class="empty">Belum ada kedudukan ditetapkan. Tetapkan kedudukan setiap pasukan di admin.html.</div>`; return; }
+
+  $("#v-zon").innerHTML=`<div class="zon-wrap"><table class="zon">
+    <thead><tr><th>KEDUDUKAN</th><th style="text-align:left">ZON</th><th>JUMLAH MATA</th></tr></thead>
+    <tbody>${rows.map(([z,pts],i)=>`<tr>
+      <td class="zn-rank">${i+1}</td><td class="zn-name">${z}</td><td class="zn-pts">${pts}</td>
+    </tr>`).join("")}</tbody>
+  </table></div>
+  <div class="sched-note">*Mata dikira ikut kedudukan yang ditetapkan admin bagi setiap pasukan (Johan=25, Naib Johan=18, Ketiga Bersama=13, Ke-5=5 ... Ke-9=1) merentasi semua kategori.</div>`;
+}
+
+boot();
+renderZon();
+
+// Auto-segar: data setiap 45s, status "sedang bermain" setiap 20s
+setInterval(async ()=>{ if(cat){ await loadAll(); renderTabs(); load(); } renderZon(); }, 45000);
+setInterval(()=>{ if(cat){ renderTabs(); renderSchedule(); } }, 20000);
+
+// ── 5-tap logo → admin (easter egg) ──
+(function(){
+  let taps=0, timer=null;
+  const logo=document.getElementById("logo");
+  if(!logo) return;
+  logo.addEventListener("click",()=>{
+    taps++;
+    clearTimeout(timer);
+    timer=setTimeout(()=>{taps=0},1200);   // reset kalau lambat sangat
+    if(taps>=5){ taps=0; window.location.href="admin.html"; }
+  });
+})();
+</script>
+</body>
+</html>
