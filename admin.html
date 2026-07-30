@@ -61,6 +61,11 @@
   .mini{padding:8px 11px;font-size:12px}
   .hidden{display:none}
 
+  .cat-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--blueSoft)}
+  .cat-row:last-child{border-bottom:none}
+  .cat-row input.cat-name{flex:1;margin:0;padding:8px 10px;font-size:13.5px;font-weight:600}
+  .cat-row input.cat-code{width:64px;margin:0;padding:8px 6px;font-size:12px;text-align:center;text-transform:uppercase}
+
   /* Editable schedule table */
   .sched-edit-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px}
   table.sed{border-collapse:collapse;width:100%;min-width:640px}
@@ -122,6 +127,18 @@
         <div><h1>Pentadbir Kejohanan</h1><div class="sub" id="who"></div></div></div>
       <button class="out" id="btnOut">Log keluar</button>
     </div>
+    <div class="card form">
+      <h3>🏷️ Urus Kategori</h3>
+      <div class="hint">Tambah, tukar nama atau padam kategori kejohanan (cth. Lelaki, Perempuan).</div>
+      <div id="catManageList"></div>
+      <div class="grid2" style="margin-top:8px">
+        <input id="nc-name" placeholder="Nama kategori (cth. Lelaki)">
+        <input id="nc-code" placeholder="Kod ringkas (cth. L)">
+      </div>
+      <button class="btn yellow" id="btnAddCat">Tambah Kategori</button>
+      <div class="msg" id="nc-msg"></div>
+    </div>
+
     <div class="tabs" id="tabs"></div>
     <div class="mode">
       <button class="on" data-mode="setup">1 · Setup</button>
@@ -244,10 +261,68 @@ async function boot(){
   if(!session){ $("#login").classList.remove("hidden"); $("#panel").classList.add("hidden"); return; }
   $("#login").classList.add("hidden"); $("#panel").classList.remove("hidden");
   $("#who").textContent = session.user.email;
-  const { data } = await sb.from("categories").select("*").order("sort_order");
-  cats=data||[]; if(cats.length && !cat) cat=cats[0].id;
-  tabs(); if(cat) load();
+  await refreshCats();
 }
+
+// ---------- CATEGORY management (add / rename / delete) ----------
+async function refreshCats(){
+  const { data } = await sb.from("categories").select("*").order("sort_order");
+  cats = data||[];
+  if(!cats.some(c=>c.id===cat)) cat = cats[0]?.id ?? null;
+  tabs(); renderCatManage();
+  if(cat){ load(); }
+  else{
+    teamList=[]; teams={}; matches=[];
+    renderCatBanner(); renderGroupLayout(); renderTeams(); renderGroup(); renderKO(); renderSchedTable();
+  }
+}
+function renderCatManage(){
+  $("#catManageList").innerHTML = cats.map(c=>`
+    <div class="cat-row" data-cid="${c.id}">
+      <input class="cat-name" data-cat-name value="${c.name}">
+      <input class="cat-code" data-cat-code value="${c.code||''}" placeholder="Kod">
+      <button class="del mini" data-delcat>✕</button>
+    </div>`).join("") || `<div class="sub">Tiada kategori lagi — tambah di bawah.</div>`;
+
+  $("#catManageList").querySelectorAll("[data-cid]").forEach(row=>{
+    const cid = +row.dataset.cid;
+    row.querySelector("[data-cat-name]").addEventListener("change", async e=>{
+      const val = e.target.value.trim();
+      const c = cats.find(x=>x.id===cid);
+      if(!val){ e.target.value = c.name; return; }
+      const { error } = await sb.from("categories").update({name:val}).eq("id",cid);
+      if(error){ alert("Gagal simpan nama: "+error.message); return; }
+      await refreshCats();
+    });
+    row.querySelector("[data-cat-code]").addEventListener("change", async e=>{
+      const val = e.target.value.trim()||null;
+      const { error } = await sb.from("categories").update({code:val}).eq("id",cid);
+      if(error){ alert("Gagal simpan kod: "+error.message); return; }
+      await refreshCats();
+    });
+    row.querySelector("[data-delcat]").onclick = async ()=>{
+      const c = cats.find(x=>x.id===cid);
+      if(!confirm(`Padam kategori "${c.name}"? Semua pasukan & perlawanan dalam kategori ini turut dipadam. Tindakan ini kekal.`)) return;
+      await sb.from("matches").delete().eq("category_id",cid);
+      await sb.from("teams").delete().eq("category_id",cid);
+      const { error } = await sb.from("categories").delete().eq("id",cid);
+      if(error){ alert("Gagal padam: "+error.message); return; }
+      if(cat===cid) cat=null;
+      await refreshCats();
+    };
+  });
+}
+$("#btnAddCat").onclick = async () => {
+  const name = $("#nc-name").value.trim();
+  if(!name){ note("#nc-msg","Isi nama kategori.",1); return; }
+  const code = $("#nc-code").value.trim().toUpperCase() || name.slice(0,1).toUpperCase();
+  const sort_order = cats.length ? Math.max(...cats.map(c=>c.sort_order||0))+1 : 1;
+  const { error } = await sb.from("categories").insert({ name, code, sort_order });
+  if(error){ note("#nc-msg","Gagal tambah: "+error.message,1); return; }
+  $("#nc-name").value=""; $("#nc-code").value="";
+  note("#nc-msg","Kategori ditambah ✓");
+  await refreshCats();
+};
 function tabs(){
   const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD tempatan
   $("#tabs").innerHTML = cats.map(c=>{
@@ -759,7 +834,7 @@ $("#catDate").onchange = async (e) => {
   const { data } = await sb.from("categories").select("*").order("sort_order");
   cats = data||[];
   note("#cd-msg", val?"Tarikh disimpan ✓":"Tarikh dikosongkan ✓");
-  tabs(); renderCatBanner();
+  tabs(); renderCatBanner(); renderCatManage();
 };
 
 boot();
