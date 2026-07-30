@@ -19,16 +19,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --blue:#1B3A6B;--blueDark:#0F2447;--blueSoft:#E7ECF5;
-    --yellow:#C9A227;--ink:#14213D;--muted:#64708A;
-    --bg:#F4F6FA;--card:#fff;--line:#DCE3F0;--win:#1B7A4A;--gold:#B8860B;
+    --blue:#211D4E;--blueDark:#15132F;--blueSoft:#E8E7F2;
+    --yellow:#F4901E;--ink:#1B1830;--muted:#6E6A85;
+    --bg:#F5F5FA;--card:#fff;--line:#E1DFEE;--win:#1B7A4A;--gold:#A6935B;--red:#C8102E;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 
   /* ── HERO ── */
-  .hero{background:linear-gradient(160deg,var(--blueDark) 0%,var(--blue) 100%);color:#fff;position:relative;padding:22px 16px 36px}
+  .hero{background:linear-gradient(160deg,var(--blueDark) 0%,var(--blue) 100%);color:#fff;position:relative;padding:22px 16px 36px;border-top:4px solid var(--red)}
   .hero-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:14px;cursor:pointer}
+  .hero img{height:52px;width:auto;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35))}
   .eyebrow{font-family:Archivo;font-weight:700;font-size:11px;letter-spacing:.16em;color:var(--yellow);text-transform:uppercase}
   h1{font-family:Archivo;font-weight:800;font-size:22px;line-height:1.15;margin-top:3px}
   .wave{position:absolute;left:0;right:0;bottom:-1px;line-height:0}
@@ -209,13 +210,14 @@
 
 <div class="hero">
   <div class="hero-inner" id="logo">
+    <img src="mahf-logo.png" alt="Malaysia Handball Federation">
     <div>
       <div class="eyebrow">Keputusan Rasmi · Bola Baling</div>
       <h1>Kejohanan Terbuka Putrajaya 2026</h1>
     </div>
   </div>
   <div class="wave"><svg viewBox="0 0 800 22" preserveAspectRatio="none">
-    <path d="M0,14 C100,4 200,24 300,14 C400,4 500,24 600,14 C700,4 800,22 800,14 L800,22 L0,22 Z" fill="#F4F6FA"/>
+    <path d="M0,14 C100,4 200,24 300,14 C400,4 500,24 600,14 C700,4 800,22 800,14 L800,22 L0,22 Z" fill="#F5F5FA"/>
   </svg></div>
 </div>
 
