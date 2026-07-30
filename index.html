@@ -3,32 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>MSSPP Bola Baling 2026 — Keputusan</title>
+<title>Terbuka Putrajaya 2026 — Bola Baling · Keputusan</title>
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="MSSPP Bola Baling 2026">
-<meta property="og:title" content="Kejohanan Bola Baling MSSPP 2026">
-<meta property="og:description" content="Keputusan rasmi, kedudukan kumpulan & bracket — Peringkat Negeri Pulau Pinang.">
-<meta property="og:url" content="https://msspp.pages.dev/">
-<meta property="og:image" content="https://msspp.pages.dev/og.png?v=1">
+<meta property="og:site_name" content="Kejohanan Bola Baling Terbuka Putrajaya 2026">
+<meta property="og:title" content="Kejohanan Bola Baling Terbuka Putrajaya 2026">
+<meta property="og:description" content="Keputusan rasmi, kedudukan kumpulan & bracket — Kejohanan Terbuka Putrajaya.">
+<meta property="og:url" content="https://putrajaya-open.pages.dev/">
+<meta property="og:image" content="https://putrajaya-open.pages.dev/og.png?v=1">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://msspp.pages.dev/og.png?v=1">
-<link rel="icon" href="msspp-logo.png">
+<meta name="twitter:image" content="https://putrajaya-open.pages.dev/og.png?v=1">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon-180.png">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --blue:#2C5CA8;--blueDark:#1B4079;--blueSoft:#E8EEF8;
-    --yellow:#F2DE1B;--ink:#152238;--muted:#6B7A94;
-    --bg:#F2F5FA;--card:#fff;--line:#D9E1EE;--win:#1B7A4A;--gold:#B98A1E;
+    --blue:#1B3A6B;--blueDark:#0F2447;--blueSoft:#E7ECF5;
+    --yellow:#C9A227;--ink:#14213D;--muted:#64708A;
+    --bg:#F4F6FA;--card:#fff;--line:#DCE3F0;--win:#1B7A4A;--gold:#B8860B;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 
   /* ── HERO ── */
   .hero{background:linear-gradient(160deg,var(--blueDark) 0%,var(--blue) 100%);color:#fff;position:relative;padding:22px 16px 36px}
-  .hero-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:14px}
-  .hero img{width:56px;height:56px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3))}
+  .hero-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:14px;cursor:pointer}
   .eyebrow{font-family:Archivo;font-weight:700;font-size:11px;letter-spacing:.16em;color:var(--yellow);text-transform:uppercase}
   h1{font-family:Archivo;font-weight:800;font-size:22px;line-height:1.15;margin-top:3px}
   .wave{position:absolute;left:0;right:0;bottom:-1px;line-height:0}
@@ -208,15 +208,14 @@
 <body>
 
 <div class="hero">
-  <div class="hero-inner">
-    <img src="msspp-logo.png" alt="MSSPP" id="logo" style="cursor:pointer">
+  <div class="hero-inner" id="logo">
     <div>
       <div class="eyebrow">Keputusan Rasmi · Bola Baling</div>
-      <h1>MSSPP Peringkat Negeri 2026</h1>
+      <h1>Kejohanan Terbuka Putrajaya 2026</h1>
     </div>
   </div>
   <div class="wave"><svg viewBox="0 0 800 22" preserveAspectRatio="none">
-    <path d="M0,14 C100,4 200,24 300,14 C400,4 500,24 600,14 C700,4 800,22 800,14 L800,22 L0,22 Z" fill="#F2F5FA"/>
+    <path d="M0,14 C100,4 200,24 300,14 C400,4 500,24 600,14 C700,4 800,22 800,14 L800,22 L0,22 Z" fill="#F4F6FA"/>
   </svg></div>
 </div>
 
@@ -241,7 +240,7 @@
   <div id="v-zon" class="hidden"></div>
   <div id="v-results" class="hidden"></div>
 
-  <footer>Majlis Sukan Sekolah Pulau Pinang · Bola Baling 2026</footer>
+  <footer>Kejohanan Bola Baling Terbuka Putrajaya 2026</footer>
 </div>
 
 <script type="module">
@@ -519,7 +518,7 @@ function renderMatrix(){
     else{stats[b].pts+=3;stats[b].w++;stats[a].l++;}
   });
 
-  // Ranking (peraturan MSSPP): MATA → DFST → JRGN → head-to-head
+  // Ranking (peraturan kejohanan): MATA → DFST → JRGN → head-to-head
   const cmp=(a,b)=>{
     const sa=stats[a.id], sb=stats[b.id];
     if(sb.pts!==sa.pts) return sb.pts-sa.pts;                 // mata
