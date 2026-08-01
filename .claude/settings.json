@@ -6,7 +6,11 @@
       "Bash(npm ls *)",
       "Bash(pip show *)",
       "Read(//c/Program Files \\\\\\(x86\\\\\\)/Microsoft/Edge/Application//**)",
-      "Read(//c/Program Files/Microsoft/Edge/**)"
+      "Read(//c/Program Files/Microsoft/Edge/**)",
+      "Bash('/c/Program Files \\(x86\\)/Microsoft/Edge/Application/msedge.exe' --headless=new --disable-gpu --no-sandbox --virtual-time-budget=4000 --screenshot=C:/Users/amiza/AppData/Local/Temp/claude/d--PUTRAJAYA-OPEN/3186e787-2ea6-41ee-bb62-9823694a15a5/scratchpad/shots/sched_live_empty.png --window-size=430,500 http://localhost:8811/index.html)",
+      "Bash('/c/Program Files \\(x86\\)/Microsoft/Edge/Application/msedge.exe' --headless=new --disable-gpu --no-sandbox --virtual-time-budget=4000 --screenshot=C:/Users/amiza/AppData/Local/Temp/claude/d--PUTRAJAYA-OPEN/3186e787-2ea6-41ee-bb62-9823694a15a5/scratchpad/shots/sched_live_tall.png --window-size=430,1400 http://localhost:8811/index.html)",
+      "Bash(node -e ' *)",
+      "Bash(\"/c/Program Files \\(x86\\)/Microsoft/Edge/Application/msedge.exe\" --headless=new --disable-gpu --no-sandbox --virtual-time-budget=4000 --dump-dom \"http://localhost:8811/index.html\")"
     ]
   }
 }
