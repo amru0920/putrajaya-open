@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Panel Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --paper:#FBFBFA; --ink:#141414; --muted:#75746F; --line:#E4E3DF;
+  --soft:#F2F1EE; --live:#14683F; --danger:#8A2C12; --wa:#0F6B4F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--paper);color:var(--ink);
+  font:400 15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;padding:0 20px 72px
+}
+.wrap{max-width:560px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;padding:26px 0 18px;border-bottom:1px solid var(--line)}
+h1{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px}
+
+nav{display:flex;gap:2px;margin:18px 0 4px;background:var(--soft);padding:3px;border-radius:7px}
+nav button{flex:1;padding:9px;border:0;background:transparent;border-radius:5px;font:500 13px inherit;font-family:inherit;color:var(--muted);cursor:pointer}
+nav button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+
+section{padding:22px 0;border-bottom:1px solid var(--line)}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:20px}
+.big{font-size:88px;line-height:.85;font-weight:600;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.big small{font-size:24px;font-weight:400;color:var(--muted);letter-spacing:0}
+.serving{display:flex;align-items:baseline;gap:14px}
+.meta{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+label{display:block;font-size:13px;font-weight:500;margin:14px 0 5px}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:#fff;font:400 16px inherit;font-family:inherit;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--ink);outline-offset:-1px;border-color:transparent}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+button.act{width:100%;margin-top:16px;padding:15px;border:0;border-radius:6px;background:var(--ink);color:#fff;font:500 15px inherit;font-family:inherit;cursor:pointer}
+button.act.wa{background:var(--wa)}
+button.act.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.act:disabled{background:#C9C8C3;cursor:not-allowed}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.no{font-variant-numeric:tabular-nums;font-weight:600;width:32px;color:var(--muted)}
+.nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini{padding:7px 11px;border:1px solid var(--line);border-radius:5px;background:#fff;font:500 12px inherit;font-family:inherit;cursor:pointer;white-space:nowrap}
+.mini.wa{color:var(--wa);border-color:#BFD9CE}
+.mini.no{color:var(--danger)}
+.pill{font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;color:var(--live)}
+
+.msg{margin-top:14px;padding:12px 14px;border-radius:6px;font-size:14px;background:var(--soft)}
+.msg.bad{background:#FBEDE9;color:var(--danger)}
+.empty{padding:18px 0;color:var(--muted);font-size:14px}
+.hide{display:none}
+
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 0;border-bottom:1px solid var(--line)}
+td{padding:9px 0;border-bottom:1px solid var(--line)}
+th:not(:first-child),td:not(:first-child){text-align:right}
+tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
+.total{display:flex;gap:28px;margin:16px 0 4px}
+.total div span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:3px}
+.total div b{font-size:30px;font-weight:600;letter-spacing:-.02em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== LOGIN ===== -->
+<div id="loginView">
+  <header><h1>Panel Admin</h1></header>
+  <section>
+    <div class="card">
+      <label for="em">E-mel</label>
+      <input id="em" type="email" autocomplete="username">
+      <label for="pw">Kata laluan</label>
+      <input id="pw" type="password" autocomplete="current-password">
+      <button class="act" id="btnLogin">Log masuk</button>
+      <div id="loginMsg"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="appView" class="hide">
+  <header>
+    <h1 id="hdr">Panel Admin</h1>
+    <button class="mini" id="btnOut">Log keluar</button>
+  </header>
+
+  <nav>
+    <button data-tab="today" class="on">Hari ini</button>
+    <button data-tab="setup">Tetapan</button>
+    <button data-tab="report">Laporan</button>
+  </nav>
+
+  <!-- ---- HARI INI ---- -->
+  <div id="tab-today">
+    <section>
+      <div class="eyebrow">Sedang potong</div>
+      <div class="card">
+        <div class="serving">
+          <div class="big" id="curNo">–</div>
+          <div>
+            <div id="curName" style="font-weight:500">Tiada</div>
+            <div class="meta" id="curTime"></div>
+          </div>
+        </div>
+        <button class="act" id="btnNext">Selesai &amp; panggil seterusnya</button>
+        <button class="act ghost" id="btnRemind">Beritahu seterusnya — hampir siap</button>
+        <div class="grid2" style="margin-top:12px">
+          <div><label for="remMin" style="margin-top:0">Ingatkan berapa minit awal</label>
+          <input id="remMin" type="number" value="10" min="1" max="60"></div>
+        </div>
+        <div id="todayMsg"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Menunggu (<span id="waitCount">0</span>)</div>
+      <div id="waitList"><div class="empty">Tiada sesiapa menunggu.</div></div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Daftar walk-in</div>
+      <div class="grid2">
+        <input id="wName" placeholder="Nama">
+        <input id="wPhone" placeholder="Telefon" inputmode="numeric">
+      </div>
+      <button class="act ghost" id="btnWalk">Tambah ke giliran</button>
+    </section>
+
+    <section>
+      <div class="eyebrow">Ringkasan hari ini</div>
+      <div class="total">
+        <div><span>Siap</span><b id="tDone">0</b></div>
+        <div><span>Menunggu</span><b id="tWait">0</b></div>
+        <div><span>Komisen</span><b id="tCom">RM0</b></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ---- TETAPAN ---- -->
+  <div id="tab-setup" class="hide">
+    <section>
+      <div class="eyebrow">Tetapan kedai</div>
+      <div class="card">
+        <label for="sName">Nama kedai</label>
+        <input id="sName">
+        <div class="grid2">
+          <div><label for="sOpen">Buka</label><input id="sOpen" type="time"></div>
+          <div><label for="sClose">Tutup</label><input id="sClose" type="time"></div>
+        </div>
+        <div class="grid2">
+          <div><label for="sDur">Anggaran seorang (minit)</label><input id="sDur" type="number" min="5" max="240"></div>
+          <div><label for="sCap">Had kepala sehari</label><input id="sCap" type="number" min="1" max="100"></div>
+        </div>
+        <label for="sCom">Komisen sekepala (RM)</label>
+        <input id="sCom" type="number" step="0.10" min="0">
+        <label for="sOpenNow">Status kedai</label>
+        <select id="sOpenNow"><option value="true">Buka — terima booking</option><option value="false">Tutup — booking ditutup</option></select>
+        <button class="act" id="btnSave">Simpan tetapan</button>
+        <div id="setMsg"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Had khas untuk hari ini sahaja</div>
+      <div class="card">
+        <label for="dCap">Had kepala hari ini</label>
+        <input id="dCap" type="number" min="0" max="100" placeholder="Kosongkan = guna had biasa">
+        <button class="act ghost" id="btnDay">Guna had ini untuk hari ini</button>
+        <div id="dayMsg"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ---- LAPORAN ---- -->
+  <div id="tab-report" class="hide">
+    <section>
+      <div class="eyebrow">Laporan bulanan</div>
+      <input id="mth" type="month">
+      <div class="total">
+        <div><span>Jumlah kepala</span><b id="rHeads">0</b></div>
+        <div><span>Komisen</span><b id="rCom">RM0</b></div>
+      </div>
+      <button class="act ghost" id="btnCsv">Muat turun CSV</button>
+    </section>
+    <section>
+      <table>
+        <thead><tr><th>Tarikh</th><th>Kepala</th><th>Tak hadir</th><th>Purata</th><th>Komisen</th></tr></thead>
+        <tbody id="rBody"></tbody>
+      </table>
+      <div class="empty hide" id="rEmpty">Tiada rekod untuk bulan ini.</div>
+    </section>
+  </div>
+</div>
+</div>
+
+<script>
+/* ============ TUKAR 2 BARIS INI ============ */
+const SUPABASE_URL = "https://XXXXXXXX.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOi...";
+/* ========================================== */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+let S = null, rowsToday = [], reportRows = [];
+
+/* -------- util -------- */
+const waNum = p => { let d=(p||"").replace(/\D/g,""); if(d.startsWith("0")) d="60"+d.slice(1);
+  if(!d.startsWith("60")) d="60"+d; return d; };
+const waOpen = (phone, text) =>
+  window.open(`https://wa.me/${waNum(phone)}?text=${encodeURIComponent(text)}`, "_blank");
+const note = (el, t, bad) => el.innerHTML = t ? `<div class="msg${bad?" bad":""}">${t}</div>` : "";
+const rm = n => "RM" + Number(n||0).toFixed(2).replace(/\.00$/,"");
+const mins = iso => iso ? Math.max(0, Math.round((Date.now()-new Date(iso))/60000)) : 0;
+
+const msgCall = b => `Salam ${b.customer_name}, giliran anda (No. ${b.queue_no}) di ${S.shop_name} dah sampai. Sila datang sekarang. Terima kasih.`;
+const msgSoon = (b,m) => `Salam ${b.customer_name}, giliran anda (No. ${b.queue_no}) di ${S.shop_name} dalam lebih kurang ${m} minit lagi. Boleh bergerak ke kedai sekarang.`;
+
+/* -------- auth -------- */
+$("btnLogin").onclick = async () => {
+  const { error } = await sb.auth.signInWithPassword({ email:$("em").value.trim(), password:$("pw").value });
+  if(error) return note($("loginMsg"), "E-mel atau kata laluan salah.", true);
+  boot();
+};
+$("btnOut").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+/* -------- tabs -------- */
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x===b));
+  ["today","setup","report"].forEach(t => $("tab-"+t).classList.toggle("hide", t!==b.dataset.tab));
+  if(b.dataset.tab === "report") loadReport();
+});
+
+/* -------- boot -------- */
+async function boot(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session) return;
+  $("loginView").classList.add("hide");
+  $("appView").classList.remove("hide");
+  await loadSettings();
+  await loadToday();
+  if(!$("mth").value) $("mth").value = new Date().toISOString().slice(0,7);
+  setInterval(loadToday, 15000);
+}
+
+/* -------- settings -------- */
+async function loadSettings(){
+  const { data } = await sb.from("shop_settings").select("*").eq("id",1).single();
+  S = data;
+  $("hdr").textContent = S.shop_name;
+  $("sName").value = S.shop_name;
+  $("sOpen").value = S.open_time.slice(0,5);
+  $("sClose").value = S.close_time.slice(0,5);
+  $("sDur").value = S.slot_duration_min;
+  $("sCap").value = S.daily_capacity;
+  $("sCom").value = S.commission_per_head;
+  $("sOpenNow").value = String(S.is_open);
+}
+
+$("btnSave").onclick = async () => {
+  const { error } = await sb.from("shop_settings").update({
+    shop_name:$("sName").value.trim() || "Barber Shop",
+    open_time:$("sOpen").value, close_time:$("sClose").value,
+    slot_duration_min:+$("sDur").value, daily_capacity:+$("sCap").value,
+    commission_per_head:+$("sCom").value, is_open:$("sOpenNow").value === "true",
+    updated_at:new Date().toISOString()
+  }).eq("id",1);
+  note($("setMsg"), error ? "Gagal simpan. Cuba lagi." : "Tetapan disimpan.", !!error);
+  if(!error) loadSettings();
+};
+
+$("btnDay").onclick = async () => {
+  const { data:d } = await sb.rpc("my_today");
+  const v = $("dCap").value;
+  if(v === "") { await sb.from("day_config").delete().eq("booking_date", d);
+    return note($("dayMsg"), "Had khas dibuang. Guna had biasa."); }
+  const { error } = await sb.from("day_config")
+    .upsert({ booking_date:d, capacity:+v, is_open:true }, { onConflict:"booking_date" });
+  note($("dayMsg"), error ? "Gagal simpan." : `Had hari ini ditetapkan ${v} kepala.`, !!error);
+  loadToday();
+};
+
+/* -------- hari ini -------- */
+async function loadToday(){
+  const { data:d } = await sb.rpc("my_today");
+  const { data } = await sb.from("bookings").select("*").eq("booking_date", d).order("queue_no");
+  rowsToday = data || [];
+
+  const cur = rowsToday.find(r => r.status === "in_progress");
+  const wait = rowsToday.filter(r => r.status === "waiting");
+  const done = rowsToday.filter(r => r.status === "done");
+
+  $("curNo").innerHTML = cur ? cur.queue_no : '<small>Tiada</small>';
+  $("curName").textContent = cur ? cur.customer_name : "Barber lapang";
+  $("curTime").textContent = cur ? `Bermula ${mins(cur.started_at)} minit lalu` : "";
+  $("btnNext").textContent = cur ? "Selesai & panggil seterusnya" : "Panggil giliran pertama";
+  $("btnNext").disabled = !cur && !wait.length;
+  $("btnRemind").disabled = !wait.length;
+
+  $("waitCount").textContent = wait.length;
+  $("waitList").innerHTML = wait.length ? wait.map(r =>
+    `<div class="row">
+       <span class="no">${r.queue_no}</span>
+       <span class="nm">${r.customer_name}${r.notified_at?' <span class="pill">dimaklum</span>':""}</span>
+       <button class="mini wa" data-wa="${r.id}">WhatsApp</button>
+       <button class="mini no" data-ns="${r.id}">Tak hadir</button>
+     </div>`).join("") : '<div class="empty">Tiada sesiapa menunggu.</div>';
+
+  $("waitList").querySelectorAll("[data-wa]").forEach(b => b.onclick = () => {
+    const r = rowsToday.find(x => x.id === b.dataset.wa);
+    waOpen(r.phone, msgSoon(r, +$("remMin").value || 10));
+    sb.rpc("mark_notified", { p_id:r.id }).then(loadToday);
+  });
+  $("waitList").querySelectorAll("[data-ns]").forEach(b => b.onclick = async () => {
+    const r = rowsToday.find(x => x.id === b.dataset.ns);
+    if(!confirm(`Tandakan No. ${r.queue_no} (${r.customer_name}) tak hadir?`)) return;
+    await sb.rpc("mark_no_show", { p_id:r.id }); loadToday();
+  });
+
+  $("tDone").textContent = done.length;
+  $("tWait").textContent = wait.length;
+  $("tCom").textContent = rm(done.length * (S?.commission_per_head || 0));
+}
+
+$("btnNext").onclick = async () => {
+  const wait = rowsToday.filter(r => r.status === "waiting");
+  if(!confirm(wait.length ? `Panggil No. ${wait[0].queue_no} (${wait[0].customer_name})?`
+                          : "Tandakan pelanggan sekarang sebagai siap?")) return;
+  const { data, error } = await sb.rpc("next_customer");
+  if(error) return note($("todayMsg"), "Gagal. Cuba lagi.", true);
+  await loadToday();
+
+  if(data.now_serving){
+    const b = data.now_serving;
+    note($("todayMsg"),
+      `Sekarang No. ${b.queue_no} — ${b.name}.
+       <button class="act wa" id="waNow" style="margin-top:10px">Hantar WhatsApp ke ${b.name}</button>`);
+    $("waNow").onclick = () => waOpen(b.phone,
+      msgCall({ customer_name:b.name, queue_no:b.queue_no }));
+  } else {
+    note($("todayMsg"), "Semua giliran selesai.");
+  }
+};
+
+$("btnRemind").onclick = () => {
+  const wait = rowsToday.filter(r => r.status === "waiting");
+  if(!wait.length) return;
+  const r = wait[0], m = +$("remMin").value || 10;
+  waOpen(r.phone, msgSoon(r, m));
+  sb.rpc("mark_notified", { p_id:r.id }).then(loadToday);
+};
+
+$("btnWalk").onclick = async () => {
+  const n = $("wName").value.trim(), p = $("wPhone").value.trim();
+  if(n.length < 2) return alert("Isi nama.");
+  const { error } = await sb.rpc("admin_add_walkin", { p_name:n, p_phone:p });
+  if(error) return alert("Gagal tambah.");
+  $("wName").value = ""; $("wPhone").value = "";
+  loadToday();
+};
+
+/* -------- laporan -------- */
+$("mth").onchange = loadReport;
+async function loadReport(){
+  const m = $("mth").value || new Date().toISOString().slice(0,7);
+  const from = m + "-01";
+  const to = new Date(new Date(from).getFullYear(), new Date(from).getMonth()+1, 0)
+             .toISOString().slice(0,10);
+  const { data } = await sb.from("daily_report").select("*")
+    .gte("booking_date", from).lte("booking_date", to).order("booking_date");
+  reportRows = data || [];
+
+  const heads = reportRows.reduce((a,r) => a + r.heads_done, 0);
+  const com   = reportRows.reduce((a,r) => a + Number(r.commission_rm), 0);
+  $("rHeads").textContent = heads;
+  $("rCom").textContent = rm(com);
+  $("rEmpty").classList.toggle("hide", !!reportRows.length);
+  $("rBody").innerHTML = reportRows.map(r =>
+    `<tr><td>${r.booking_date.slice(8)}/${r.booking_date.slice(5,7)}</td>
+     <td>${r.heads_done}</td><td>${r.no_show}</td>
+     <td>${r.avg_min ?? "–"}</td><td>${rm(r.commission_rm)}</td></tr>`).join("");
+}
+
+$("btnCsv").onclick = () => {
+  if(!reportRows.length) return alert("Tiada data.");
+  const head = "tarikh,kepala_siap,tak_hadir,dibatalkan,jumlah_booking,purata_minit,komisen_rm";
+  const body = reportRows.map(r => [r.booking_date, r.heads_done, r.no_show, r.cancelled,
+    r.total_booking, r.avg_min ?? "", Number(r.commission_rm).toFixed(2)].join(","));
+  const total = ["JUMLAH", reportRows.reduce((a,r)=>a+r.heads_done,0), "", "", "", "",
+    reportRows.reduce((a,r)=>a+Number(r.commission_rm),0).toFixed(2)].join(",");
+  const blob = new Blob(["\uFEFF"+[head,...body,total].join("\n")], { type:"text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `komisen-${$("mth").value}.csv`;
+  a.click();
+};
+
+boot();
+</script>
+</body>
+</html>

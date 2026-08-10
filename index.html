@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ambil Giliran</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --paper:#FBFBFA; --ink:#141414; --muted:#75746F; --line:#E4E3DF;
+  --soft:#F2F1EE; --live:#14683F; --warn:#8A5A12;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font:400 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; padding:0 20px 64px;
+}
+.wrap{max-width:440px;margin:0 auto}
+header{padding:32px 0 24px;border-bottom:1px solid var(--line)}
+h1{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.sub{font-size:13px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--live);margin-right:6px;vertical-align:middle}
+.dot.off{background:#B4B3AE}
+
+section{padding:28px 0;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+/* nombor giliran = elemen utama */
+.big{font-size:104px;line-height:.85;font-weight:600;letter-spacing:-.05em;font-variant-numeric:tabular-nums;margin:10px 0 2px}
+.big small{font-size:28px;font-weight:400;color:var(--muted);letter-spacing:0}
+.serving{display:flex;align-items:baseline;gap:14px}
+.meta{font-size:14px;color:var(--muted)}
+
+label{display:block;font-size:13px;font-weight:500;margin:16px 0 6px}
+input{
+  width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:6px;
+  background:#fff;font-size:16px;font-family:inherit;color:var(--ink)
+}
+input:focus{outline:2px solid var(--ink);outline-offset:-1px;border-color:transparent}
+button{
+  width:100%;margin-top:20px;padding:14px;border:0;border-radius:6px;
+  background:var(--ink);color:#fff;font:500 15px inherit;font-family:inherit;cursor:pointer
+}
+button:disabled{background:#C9C8C3;cursor:not-allowed}
+button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);margin-top:10px}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.msg{margin-top:14px;padding:12px 14px;border-radius:6px;font-size:14px;background:var(--soft);color:var(--ink)}
+.msg.bad{background:#FBEDE9;color:#8A2C12}
+
+.row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}
+.row:last-child{border-bottom:0}
+.no{font-variant-numeric:tabular-nums;font-weight:600;width:38px;color:var(--muted)}
+.row.now .no,.row.now span{color:var(--live);font-weight:600}
+.tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--live);font-weight:600}
+.empty{padding:20px 0;color:var(--muted);font-size:14px}
+.hide{display:none}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:20px;margin-top:4px}
+.foot{padding-top:20px;font-size:12px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1 id="shopName">Barber Shop</h1>
+    <div class="sub"><span class="dot" id="dot"></span><span id="shopStatus">Memuatkan…</span></div>
+  </header>
+
+  <!-- SEDANG POTONG -->
+  <section>
+    <div class="eyebrow">Sedang potong</div>
+    <div class="serving">
+      <div class="big" id="nowServing">–</div>
+      <div class="meta" id="nowName"></div>
+    </div>
+    <div class="meta" id="capLine"></div>
+  </section>
+
+  <!-- TIKET SAYA -->
+  <section id="ticketBox" class="hide">
+    <div class="eyebrow">Giliran anda</div>
+    <div class="card">
+      <div class="big" id="myNo">–</div>
+      <div class="meta" id="myInfo"></div>
+      <div id="myMsg"></div>
+      <button class="ghost" id="btnCancel">Batalkan giliran</button>
+    </div>
+  </section>
+
+  <!-- BORANG -->
+  <section id="formBox">
+    <div class="eyebrow">Ambil giliran</div>
+    <label for="nm">Nama</label>
+    <input id="nm" placeholder="Nama anda" autocomplete="name" maxlength="40">
+    <label for="ph">Nombor telefon</label>
+    <input id="ph" type="tel" placeholder="0123456789" autocomplete="tel" inputmode="numeric">
+    <button id="btnBook">Ambil giliran</button>
+    <div id="formMsg"></div>
+  </section>
+
+  <!-- SENARAI -->
+  <section>
+    <div class="eyebrow">Senarai menunggu</div>
+    <div id="list"><div class="empty">Belum ada sesiapa dalam giliran.</div></div>
+  </section>
+
+  <div class="foot">Skrin ini dikemas kini automatik setiap 12 saat.</div>
+</div>
+
+<script>
+/* ============ TUKAR 2 BARIS INI ============ */
+const SUPABASE_URL = "https://nghoxxbbxzfaadjujbkq.supabase.co;
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naG94eGJieHpmYWFkanVqYmtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzMjI2MjAsImV4cCI6MjEwMTg5ODYyMH0.zrwZGcE8LLZd4CZdy0MUuAbLZ4OYSsW2z5aru6coA64";
+/* ========================================== */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+const KEY = "barber_ticket";
+let settings = null;
+
+const ERR = {
+  FULL:"Slot hari ini dah penuh. Cuba lagi esok.",
+  SHOP_CLOSED:"Kedai tutup hari ini.",
+  DUPLICATE_PHONE:"Nombor ini dah ada giliran aktif hari ini.",
+  INVALID_PHONE:"Nombor telefon tidak sah.",
+  INVALID_NAME:"Isi nama penuh anda."
+};
+const errMsg = e => {
+  const m = (e && e.message) || "";
+  for (const k in ERR) if (m.includes(k)) return ERR[k];
+  return "Sambungan bermasalah. Cuba lagi.";
+};
+const note = (el, text, bad) =>
+  el.innerHTML = text ? `<div class="msg${bad?" bad":""}">${text}</div>` : "";
+
+async function loadSettings(){
+  const { data } = await sb.from("shop_settings").select("*").eq("id",1).single();
+  if(!data) return;
+  settings = data;
+  $("shopName").textContent = data.shop_name;
+  document.title = data.shop_name + " — Giliran";
+  const open = data.is_open;
+  $("dot").className = "dot" + (open ? "" : " off");
+  $("shopStatus").textContent = open
+    ? `Buka · ${data.open_time.slice(0,5)}–${data.close_time.slice(0,5)}`
+    : "Tutup hari ini";
+  $("btnBook").disabled = !open;
+}
+
+async function loadQueue(){
+  const { data } = await sb.from("queue_public").select("*").order("queue_no");
+  const rows = data || [];
+  const now = rows.find(r => r.status === "in_progress");
+  const waiting = rows.filter(r => r.status === "waiting");
+
+  $("nowServing").innerHTML = now ? now.queue_no : '<small>Tiada</small>';
+  $("nowName").textContent = now ? now.display_name : "Barber sedang lapang";
+
+  const cap = settings ? settings.daily_capacity : null;
+  const used = rows.length;
+  $("capLine").textContent = cap ? `${used} / ${cap} kepala diambil hari ini` : "";
+  $("btnBook").disabled = !settings || !settings.is_open || (cap && used >= cap);
+
+  const list = $("list");
+  if(!waiting.length){
+    list.innerHTML = '<div class="empty">Tiada sesiapa menunggu.</div>';
+  } else {
+    list.innerHTML = waiting.map((r,i) =>
+      `<div class="row"><span class="no">${r.queue_no}</span>
+       <span style="flex:1">${r.display_name}</span>
+       <span class="meta">${i===0?"seterusnya":"± "+((i+1)*(settings?.slot_duration_min||60))+" min"}</span></div>`
+    ).join("");
+  }
+}
+
+async function loadTicket(){
+  const id = localStorage.getItem(KEY);
+  if(!id){ $("ticketBox").classList.add("hide"); $("formBox").classList.remove("hide"); return; }
+
+  const { data } = await sb.rpc("my_booking", { p_id: id });
+  if(!data){ localStorage.removeItem(KEY); return loadTicket(); }
+
+  if(["done","no_show","cancelled"].includes(data.status)){
+    localStorage.removeItem(KEY);
+    $("ticketBox").classList.add("hide");
+    $("formBox").classList.remove("hide");
+    return;
+  }
+
+  $("ticketBox").classList.remove("hide");
+  $("formBox").classList.add("hide");
+  $("myNo").textContent = data.queue_no;
+  $("myInfo").textContent = data.name;
+
+  if(data.status === "in_progress"){
+    note($("myMsg"), "Giliran anda sekarang. Sila masuk.");
+  } else if(data.ahead === 0){
+    note($("myMsg"), "Anda seterusnya. Sila bersedia berdekatan kedai.");
+  } else {
+    note($("myMsg"), `${data.ahead} orang di hadapan · anggaran ± ${data.eta_min} minit`);
+  }
+  $("btnCancel").style.display = data.status === "waiting" ? "block" : "none";
+}
+
+function deviceId(){
+  let d = localStorage.getItem("barber_dev");
+  if(!d){ d = crypto.randomUUID(); localStorage.setItem("barber_dev", d); }
+  return d;
+}
+
+$("btnBook").onclick = async () => {
+  const nm = $("nm").value.trim(), ph = $("ph").value.trim();
+  if(nm.length < 2) return note($("formMsg"), "Isi nama anda.", true);
+  if(ph.replace(/\D/g,"").length < 9) return note($("formMsg"), "Nombor telefon tidak sah.", true);
+
+  $("btnBook").disabled = true;
+  $("btnBook").textContent = "Menyimpan…";
+  const { data, error } = await sb.rpc("create_booking",
+    { p_name: nm, p_phone: ph, p_device: deviceId() });
+  $("btnBook").textContent = "Ambil giliran";
+
+  if(error){ $("btnBook").disabled = false; return note($("formMsg"), errMsg(error), true); }
+  localStorage.setItem(KEY, data.id);
+  note($("formMsg"), "");
+  $("nm").value = ""; $("ph").value = "";
+  refresh();
+};
+
+$("btnCancel").onclick = async () => {
+  if(!confirm("Batalkan giliran anda?")) return;
+  await sb.rpc("cancel_booking", { p_id: localStorage.getItem(KEY) });
+  localStorage.removeItem(KEY);
+  refresh();
+};
+
+async function refresh(){ await loadSettings(); await loadQueue(); await loadTicket(); }
+refresh();
+setInterval(refresh, 12000);
+document.addEventListener("visibilitychange", () => { if(!document.hidden) refresh(); });
+</script>
+</body>
+</html>
