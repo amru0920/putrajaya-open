@@ -71,55 +71,84 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .hide{display:none}
 .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:20px;margin-top:4px}
 .foot{padding-top:20px;font-size:12px;color:var(--muted);text-align:center}
+
+/* pilih barber */
+.shopcard{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:#fff;border:1px solid var(--line);border-radius:8px;
+  padding:18px 18px;margin-top:10px;text-decoration:none;color:inherit;
+  min-height:44px;
+}
+.shopcard:active{background:var(--soft)}
+.shopcard-name{font-size:16px;font-weight:600;letter-spacing:-.01em}
+.chev{color:var(--muted);font-size:20px}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header>
-    <h1 id="shopName">Barber Shop</h1>
-    <div class="sub"><span class="dot" id="dot"></span><span id="shopStatus">Memuatkan…</span></div>
-  </header>
+  <!-- PILIH BARBER -->
+  <div id="pickerView">
+    <header>
+      <h1>Pilih Barber</h1>
+      <div class="sub">Pilih kedai untuk ambil giliran</div>
+    </header>
+    <section>
+      <div id="pickerList"><div class="empty">Memuatkan…</div></div>
+    </section>
+    <div class="foot"><a href="admin.html" style="color:inherit">Admin</a></div>
+  </div>
 
-  <!-- SEDANG POTONG -->
-  <section>
-    <div class="eyebrow">Sedang potong</div>
-    <div class="serving">
-      <div class="big" id="nowServing">–</div>
-      <div class="meta" id="nowName"></div>
+  <!-- BOOKING (kedai dipilih) -->
+  <div id="bookingView" class="hide">
+    <header>
+      <h1 id="shopName">Barber Shop</h1>
+      <div class="sub"><span class="dot" id="dot"></span><span id="shopStatus">Memuatkan…</span></div>
+    </header>
+
+    <!-- SEDANG POTONG -->
+    <section>
+      <div class="eyebrow">Sedang potong</div>
+      <div class="serving">
+        <div class="big" id="nowServing">–</div>
+        <div class="meta" id="nowName"></div>
+      </div>
+      <div class="meta" id="capLine"></div>
+    </section>
+
+    <!-- TIKET SAYA -->
+    <section id="ticketBox" class="hide">
+      <div class="eyebrow">Giliran anda</div>
+      <div class="card">
+        <div class="big" id="myNo">–</div>
+        <div class="meta" id="myInfo"></div>
+        <div id="myMsg"></div>
+        <button class="ghost" id="btnCancel">Batalkan giliran</button>
+      </div>
+    </section>
+
+    <!-- BORANG -->
+    <section id="formBox">
+      <div class="eyebrow">Ambil giliran</div>
+      <label for="nm">Nama</label>
+      <input id="nm" placeholder="Nama anda" autocomplete="name" maxlength="40">
+      <label for="ph">Nombor telefon</label>
+      <input id="ph" type="tel" placeholder="0123456789" autocomplete="tel" inputmode="numeric">
+      <button id="btnBook">Ambil giliran</button>
+      <div id="formMsg"></div>
+    </section>
+
+    <!-- SENARAI -->
+    <section>
+      <div class="eyebrow">Senarai menunggu</div>
+      <div id="list"><div class="empty">Belum ada sesiapa dalam giliran.</div></div>
+    </section>
+
+    <div class="foot">Skrin ini dikemas kini automatik setiap 12 saat.<br>
+      <a href="?" style="color:inherit">Tukar barber</a> · <a href="admin.html" style="color:inherit">Admin</a>
     </div>
-    <div class="meta" id="capLine"></div>
-  </section>
+  </div>
 
-  <!-- TIKET SAYA -->
-  <section id="ticketBox" class="hide">
-    <div class="eyebrow">Giliran anda</div>
-    <div class="card">
-      <div class="big" id="myNo">–</div>
-      <div class="meta" id="myInfo"></div>
-      <div id="myMsg"></div>
-      <button class="ghost" id="btnCancel">Batalkan giliran</button>
-    </div>
-  </section>
-
-  <!-- BORANG -->
-  <section id="formBox">
-    <div class="eyebrow">Ambil giliran</div>
-    <label for="nm">Nama</label>
-    <input id="nm" placeholder="Nama anda" autocomplete="name" maxlength="40">
-    <label for="ph">Nombor telefon</label>
-    <input id="ph" type="tel" placeholder="0123456789" autocomplete="tel" inputmode="numeric">
-    <button id="btnBook">Ambil giliran</button>
-    <div id="formMsg"></div>
-  </section>
-
-  <!-- SENARAI -->
-  <section>
-    <div class="eyebrow">Senarai menunggu</div>
-    <div id="list"><div class="empty">Belum ada sesiapa dalam giliran.</div></div>
-  </section>
-
-  <div class="foot">Skrin ini dikemas kini automatik setiap 12 saat.<br><a href="admin.html" style="color:inherit">Admin</a></div>
 </div>
 
 <script>
@@ -130,12 +159,14 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = id => document.getElementById(id);
-const KEY = "barber_ticket";
-let settings = null;
+
+const slug = new URLSearchParams(location.search).get("kedai");
+let shopId = null, KEY = null, settings = null;
 
 const ERR = {
   FULL:"Slot hari ini dah penuh. Cuba lagi esok.",
   SHOP_CLOSED:"Kedai tutup hari ini.",
+  SHOP_NOT_FOUND:"Kedai tidak dijumpai.",
   DUPLICATE_PHONE:"Nombor ini dah ada giliran aktif hari ini.",
   INVALID_PHONE:"Nombor telefon tidak sah.",
   INVALID_NAME:"Isi nama penuh anda."
@@ -148,8 +179,27 @@ const errMsg = e => {
 const note = (el, text, bad) =>
   el.innerHTML = text ? `<div class="msg${bad?" bad":""}">${text}</div>` : "";
 
+async function loadPicker(){
+  const { data } = await sb.from("shops_public").select("*").order("shop_name");
+  const rows = data || [];
+  if(!rows.length){
+    $("pickerList").innerHTML = '<div class="empty">Tiada kedai lagi.</div>';
+    return;
+  }
+  $("pickerList").innerHTML = rows.map(s => `
+    <a class="shopcard" href="?kedai=${encodeURIComponent(s.slug)}">
+      <div>
+        <div class="shopcard-name">${s.shop_name}</div>
+        <div class="meta"><span class="dot${s.is_open ? "" : " off"}"></span>${
+          s.is_open ? `Buka · ${s.open_time.slice(0,5)}–${s.close_time.slice(0,5)}` : "Tutup"
+        }</div>
+      </div>
+      <span class="chev">›</span>
+    </a>`).join("");
+}
+
 async function loadSettings(){
-  const { data } = await sb.from("shop_settings").select("*").eq("id",1).single();
+  const { data } = await sb.from("shops_public").select("*").eq("id", shopId).single();
   if(!data) return;
   settings = data;
   $("shopName").textContent = data.shop_name;
@@ -163,7 +213,7 @@ async function loadSettings(){
 }
 
 async function loadQueue(){
-  const { data } = await sb.from("queue_public").select("*").order("queue_no");
+  const { data } = await sb.from("queue_public").select("*").eq("shop_id", shopId).order("queue_no");
   const rows = data || [];
   const now = rows.find(r => r.status === "in_progress");
   const waiting = rows.filter(r => r.status === "waiting");
@@ -231,7 +281,7 @@ $("btnBook").onclick = async () => {
   $("btnBook").disabled = true;
   $("btnBook").textContent = "Menyimpan…";
   const { data, error } = await sb.rpc("create_booking",
-    { p_name: nm, p_phone: ph, p_device: deviceId() });
+    { p_shop_id: shopId, p_name: nm, p_phone: ph, p_device: deviceId() });
   $("btnBook").textContent = "Ambil giliran";
 
   if(error){ $("btnBook").disabled = false; return note($("formMsg"), errMsg(error), true); }
@@ -249,9 +299,35 @@ $("btnCancel").onclick = async () => {
 };
 
 async function refresh(){ await loadSettings(); await loadQueue(); await loadTicket(); }
-refresh();
-setInterval(refresh, 12000);
-document.addEventListener("visibilitychange", () => { if(!document.hidden) refresh(); });
+
+async function boot(){
+  if(!slug){
+    $("pickerView").classList.remove("hide");
+    $("bookingView").classList.add("hide");
+    await loadPicker();
+    return;
+  }
+
+  const { data } = await sb.from("shops_public").select("*").eq("slug", slug).single();
+  if(!data){
+    $("pickerView").classList.remove("hide");
+    $("bookingView").classList.add("hide");
+    await loadPicker();
+    $("pickerList").insertAdjacentHTML("beforebegin",
+      '<div class="msg bad">Kedai tidak dijumpai. Sila pilih dari senarai di bawah.</div>');
+    return;
+  }
+
+  shopId = data.id;
+  KEY = "barber_ticket_" + slug;
+  $("pickerView").classList.add("hide");
+  $("bookingView").classList.remove("hide");
+  await refresh();
+  setInterval(refresh, 12000);
+  document.addEventListener("visibilitychange", () => { if(!document.hidden) refresh(); });
+}
+
+boot();
 </script>
 </body>
 </html>

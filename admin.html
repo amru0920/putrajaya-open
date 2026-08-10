@@ -164,7 +164,8 @@ tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
           <div><label for="sCap">Had kepala sehari</label><input id="sCap" type="number" min="1" max="100"></div>
         </div>
         <label for="sCom">Komisen sekepala (RM)</label>
-        <input id="sCom" type="number" step="0.10" min="0">
+        <div class="meta" id="sCom" style="font-size:16px;color:var(--ink);padding:11px 0">–</div>
+        <div class="meta" style="margin-top:-8px">Ditetapkan oleh platform, bukan boleh ubah sendiri.</div>
         <label for="sOpenNow">Status kedai</label>
         <select id="sOpenNow"><option value="true">Buka — terima booking</option><option value="false">Tutup — booking ditutup</option></select>
         <button class="act" id="btnSave">Simpan tetapan</button>
@@ -246,9 +247,10 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
 async function boot(){
   const { data:{ session } } = await sb.auth.getSession();
   if(!session) return;
+  const ok = await loadSettings();
+  if(!ok) return note($("loginMsg"), "Akaun ni tiada kedai berdaftar. Hubungi platform admin.", true);
   $("loginView").classList.add("hide");
   $("appView").classList.remove("hide");
-  await loadSettings();
   await loadToday();
   if(!$("mth").value) $("mth").value = new Date().toISOString().slice(0,7);
   setInterval(loadToday, 15000);
@@ -256,7 +258,9 @@ async function boot(){
 
 /* -------- settings -------- */
 async function loadSettings(){
-  const { data } = await sb.from("shop_settings").select("*").eq("id",1).single();
+  const { data:{ session } } = await sb.auth.getSession();
+  const { data } = await sb.from("shops").select("*").eq("owner_user_id", session.user.id).single();
+  if(!data) return false;
   S = data;
   $("hdr").textContent = S.shop_name;
   $("sName").value = S.shop_name;
@@ -264,18 +268,19 @@ async function loadSettings(){
   $("sClose").value = S.close_time.slice(0,5);
   $("sDur").value = S.slot_duration_min;
   $("sCap").value = S.daily_capacity;
-  $("sCom").value = S.commission_per_head;
+  $("sCom").textContent = rm(S.commission_per_head);
   $("sOpenNow").value = String(S.is_open);
+  return true;
 }
 
 $("btnSave").onclick = async () => {
-  const { error } = await sb.from("shop_settings").update({
+  const { error } = await sb.from("shops").update({
     shop_name:$("sName").value.trim() || "Barber Shop",
     open_time:$("sOpen").value, close_time:$("sClose").value,
     slot_duration_min:+$("sDur").value, daily_capacity:+$("sCap").value,
-    commission_per_head:+$("sCom").value, is_open:$("sOpenNow").value === "true",
+    is_open:$("sOpenNow").value === "true",
     updated_at:new Date().toISOString()
-  }).eq("id",1);
+  }).eq("id", S.id);
   note($("setMsg"), error ? "Gagal simpan. Cuba lagi." : "Tetapan disimpan.", !!error);
   if(!error) loadSettings();
 };
@@ -283,10 +288,10 @@ $("btnSave").onclick = async () => {
 $("btnDay").onclick = async () => {
   const { data:d } = await sb.rpc("my_today");
   const v = $("dCap").value;
-  if(v === "") { await sb.from("day_config").delete().eq("booking_date", d);
+  if(v === "") { await sb.from("day_config").delete().eq("booking_date", d).eq("shop_id", S.id);
     return note($("dayMsg"), "Had khas dibuang. Guna had biasa."); }
   const { error } = await sb.from("day_config")
-    .upsert({ booking_date:d, capacity:+v, is_open:true }, { onConflict:"booking_date" });
+    .upsert({ booking_date:d, shop_id:S.id, capacity:+v, is_open:true }, { onConflict:"shop_id,booking_date" });
   note($("dayMsg"), error ? "Gagal simpan." : `Had hari ini ditetapkan ${v} kepala.`, !!error);
   loadToday();
 };
@@ -294,7 +299,7 @@ $("btnDay").onclick = async () => {
 /* -------- hari ini -------- */
 async function loadToday(){
   const { data:d } = await sb.rpc("my_today");
-  const { data } = await sb.from("bookings").select("*").eq("booking_date", d).order("queue_no");
+  const { data } = await sb.from("bookings").select("*").eq("booking_date", d).eq("shop_id", S.id).order("queue_no");
   rowsToday = data || [];
 
   const cur = rowsToday.find(r => r.status === "in_progress");
@@ -377,7 +382,7 @@ async function loadReport(){
   const from = m + "-01";
   const to = new Date(new Date(from).getFullYear(), new Date(from).getMonth()+1, 0)
              .toISOString().slice(0,10);
-  const { data } = await sb.from("daily_report").select("*")
+  const { data } = await sb.from("daily_report").select("*").eq("shop_id", S.id)
     .gte("booking_date", from).lte("booking_date", to).order("booking_date");
   reportRows = data || [];
 
