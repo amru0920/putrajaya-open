@@ -11,7 +11,13 @@
       "Bash(python \"/tmp/gen_favicon.py\")",
       "Read(//c/Program Files/Google/Chrome/Application/**)",
       "Read(//c/Program Files \\\\\\(x86\\\\\\)/Google/Chrome/Application/**)",
-      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --screenshot=\"C:/Users/amiza/AppData/Local/Temp/claude/d--BARBER/1bd37d0a-d4d3-4f46-a08f-aa1cad462937/scratchpad/index_preview.png\" --window-size=440,1400 \"file:///d:/BARBER/index.html\")"
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --screenshot=\"C:/Users/amiza/AppData/Local/Temp/claude/d--BARBER/1bd37d0a-d4d3-4f46-a08f-aa1cad462937/scratchpad/index_preview.png\" --window-size=440,1400 \"file:///d:/BARBER/index.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --screenshot=\"C:/Users/amiza/AppData/Local/Temp/claude/d--BARBER/1bd37d0a-d4d3-4f46-a08f-aa1cad462937/scratchpad/picker_preview.png\" --window-size=440,700 \"file:///d:/BARBER/index.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --screenshot=\"C:/Users/amiza/AppData/Local/Temp/claude/d--BARBER/1bd37d0a-d4d3-4f46-a08f-aa1cad462937/scratchpad/admin_login.png\" --window-size=560,500 \"file:///d:/BARBER/admin.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --screenshot=\"C:/Users/amiza/AppData/Local/Temp/claude/d--BARBER/1bd37d0a-d4d3-4f46-a08f-aa1cad462937/scratchpad/platform_login.png\" --window-size=640,500 \"file:///d:/BARBER/platform.html\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
