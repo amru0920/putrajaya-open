@@ -216,14 +216,21 @@ async function boot(){
   $("appView").classList.remove("hide");
 
   $("shopList").innerHTML = shops.map(s => `
-    <div class="card" data-shop="${s.id}" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer">
-      <div>
-        <div style="font-weight:600">${s.shop_name}</div>
+    <div class="card" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;${s.is_active?"":"opacity:.55"}">
+      <div data-open="${s.id}" style="flex:1;min-width:0;cursor:pointer">
+        <div style="font-weight:600">${s.shop_name}${s.is_active?"":' <span class="empty" style="padding:0;display:inline">— nyahaktif</span>'}</div>
         <div class="empty" style="padding:2px 0"><span class="dot${s.is_open?"":" off"}"></span>${s.is_open ? "Buka" : "Tutup"} · /${s.slug} · RM${Number(s.commission_per_head).toFixed(2)}/kepala</div>
       </div>
-      <span style="color:var(--muted);font-size:20px">›</span>
+      <button class="mini" data-toggle="${s.id}" style="${s.is_active?"color:var(--danger)":"color:var(--live)"};white-space:nowrap">${s.is_active ? "Nyahaktifkan" : "Aktifkan"}</button>
     </div>`).join("");
-  $("shopList").querySelectorAll("[data-shop]").forEach(el => el.onclick = () => openShop(el.dataset.shop));
+  $("shopList").querySelectorAll("[data-open]").forEach(el => el.onclick = () => openShop(el.dataset.open));
+  $("shopList").querySelectorAll("[data-toggle]").forEach(el => el.onclick = async () => {
+    const s = shops.find(x => x.id === el.dataset.toggle);
+    const verb = s.is_active ? "nyahaktifkan" : "aktifkan";
+    if(!confirm(`Betul nak ${verb} kedai "${s.shop_name}"?${s.is_active ? " Barber tu tak boleh log masuk dan kedai dia hilang dari senarai customer." : ""}`)) return;
+    await sb.from("shops").update({ is_active: !s.is_active }).eq("id", s.id);
+    boot();
+  });
 
   if(!$("mth").value) $("mth").value = new Date().toISOString().slice(0,7);
   await loadReport();

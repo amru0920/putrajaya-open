@@ -275,7 +275,8 @@ async function boot(){
 /* -------- settings -------- */
 async function loadSettings(){
   const { data:{ session } } = await sb.auth.getSession();
-  const { data } = await sb.from("shops").select("*").eq("owner_user_id", session.user.id).single();
+  const { data } = await sb.from("shops").select("*")
+    .eq("owner_user_id", session.user.id).eq("is_active", true).single();
   if(!data) return false;
   S = data;
   $("hdr").textContent = S.shop_name;
