@@ -203,11 +203,14 @@ async function boot(){
   const { data:{ session } } = await sb.auth.getSession();
   if(!session) return;
 
-  const { data: shopRows, error } = await sb.from("shops").select("*").order("shop_name");
-  if(error || !shopRows || !shopRows.length){
+  const { data: adminRow } = await sb.from("platform_admins")
+    .select("user_id").eq("user_id", session.user.id).maybeSingle();
+  if(!adminRow){
     return note($("loginMsg"), "Akaun ni bukan platform admin.", true);
   }
-  shops = shopRows;
+
+  const { data: shopRows } = await sb.from("shops").select("*").order("shop_name");
+  shops = shopRows || [];
 
   $("loginView").classList.add("hide");
   $("appView").classList.remove("hide");
