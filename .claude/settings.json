@@ -17,7 +17,16 @@
       "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --screenshot=\"C:/Users/amiza/AppData/Local/Temp/claude/d--BARBER/1bd37d0a-d4d3-4f46-a08f-aa1cad462937/scratchpad/platform_login.png\" --window-size=640,500 \"file:///d:/BARBER/platform.html\")",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(where supabase *)",
+      "Bash(npx supabase *)",
+      "Bash(supabase --version)",
+      "Bash(supabase projects *)",
+      "Bash(mkdir -p \"d:/BARBER/supabase/functions/platform-add-barber\")",
+      "Bash(python \"/tmp/gen_platform_assets.py\")"
+    ],
+    "additionalDirectories": [
+      "d:\\BARBER\\supabase\\functions"
     ]
   }
 }

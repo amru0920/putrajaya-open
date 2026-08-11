@@ -6,8 +6,16 @@
 <title>Platform Admin</title>
 <meta name="theme-color" content="#141414">
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-platform-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon-platform.png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Platform Admin — Barber Shop">
+<meta property="og:description" content="Urus barber & komisen — semua kedai.">
+<meta property="og:image" content="https://booking-barber.pages.dev/assets/og-platform.png">
+<meta property="og:url" content="https://booking-barber.pages.dev/platform.html">
+<meta name="twitter:card" content="summary_large_image">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -73,6 +81,22 @@ tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
   </header>
 
   <section>
+    <div class="eyebrow">Tambah barber baru</div>
+    <div class="card">
+      <label for="nEmail">E-mel barber</label>
+      <input id="nEmail" type="email" placeholder="barber@contoh.com">
+      <label for="nSlug">Slug (untuk link customer dia)</label>
+      <input id="nSlug" placeholder="contoh: ali">
+      <label for="nShopName">Nama kedai</label>
+      <input id="nShopName" placeholder="contoh: Kedai Gunting Ali">
+      <label for="nPass">Kata laluan sementara</label>
+      <input id="nPass" readonly>
+      <button class="act" id="btnAddBarber">Tambah barber</button>
+      <div id="addMsg"></div>
+    </div>
+  </section>
+
+  <section>
     <div class="eyebrow">Semua kedai</div>
     <div id="shopList"><div class="empty">Memuatkan…</div></div>
   </section>
@@ -105,12 +129,59 @@ const note = (el, t, bad) => el.innerHTML = t ? `<div class="msg${bad?" bad":""}
 const rm = n => "RM" + Number(n||0).toFixed(2).replace(/\.00$/,"");
 let shops = [];
 
+const ADD_ERR = {
+  MISSING_FIELDS:"Isi semua ruangan.",
+  INVALID_SLUG:"Slug tak sah — huruf kecil/nombor/tanda sengkang je, 2-40 aksara.",
+  WEAK_PASSWORD:"Kata laluan terlalu pendek (min 8 aksara).",
+  UNAUTHORIZED:"Akaun ni bukan platform admin.",
+  USER_CREATE_FAILED:"Gagal buat akaun — mungkin e-mel dah digunakan.",
+  SHOP_CREATE_FAILED:"Gagal daftar kedai — mungkin slug dah digunakan."
+};
+function genPassword(){
+  const bytes = crypto.getRandomValues(new Uint8Array(9));
+  return btoa(String.fromCharCode(...bytes)).replace(/[+/=]/g,"").slice(0,12) + "!1";
+}
+$("nPass").value = genPassword();
+
 $("btnLogin").onclick = async () => {
   const { error } = await sb.auth.signInWithPassword({ email:$("em").value.trim(), password:$("pw").value });
   if(error) return note($("loginMsg"), "E-mel atau kata laluan salah.", true);
   boot();
 };
 $("btnOut").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+$("btnAddBarber").onclick = async () => {
+  const email = $("nEmail").value.trim();
+  const slug = $("nSlug").value.trim().toLowerCase();
+  const shop_name = $("nShopName").value.trim();
+  const password = $("nPass").value;
+
+  $("btnAddBarber").disabled = true;
+  $("btnAddBarber").textContent = "Menambah…";
+  const { data, error } = await sb.functions.invoke("platform-add-barber", {
+    body: { email, password, slug, shop_name }
+  });
+  $("btnAddBarber").disabled = false;
+  $("btnAddBarber").textContent = "Tambah barber";
+
+  let errCode = null;
+  if(error){
+    try { errCode = (await error.context.json()).error; } catch(_) { errCode = "SERVER_ERROR"; }
+  } else if(data?.error){
+    errCode = data.error;
+  }
+  if(errCode){
+    return note($("addMsg"), ADD_ERR[errCode] || "Gagal tambah barber. Cuba lagi.", true);
+  }
+
+  note($("addMsg"),
+    `Berjaya! Bagi kredential ni kepada barber:<br>
+     E-mel: <b>${email}</b><br>Kata laluan: <b>${password}</b><br>
+     Link customer dia: <b>?kedai=${slug}</b>`);
+  $("nEmail").value = ""; $("nSlug").value = ""; $("nShopName").value = "";
+  $("nPass").value = genPassword();
+  boot();
+};
 
 async function boot(){
   const { data:{ session } } = await sb.auth.getSession();
