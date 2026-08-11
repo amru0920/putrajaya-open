@@ -98,6 +98,7 @@ tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
 
   <nav>
     <button data-tab="today" class="on">Hari ini</button>
+    <button data-tab="history">Sejarah</button>
     <button data-tab="setup">Tetapan</button>
     <button data-tab="report">Laporan</button>
   </nav>
@@ -145,6 +146,20 @@ tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
         <div><span>Menunggu</span><b id="tWait">0</b></div>
         <div><span>Komisen</span><b id="tCom">RM0</b></div>
       </div>
+    </section>
+  </div>
+
+  <!-- ---- SEJARAH ---- -->
+  <div id="tab-history" class="hide">
+    <section>
+      <div class="eyebrow">Sejarah booking</div>
+      <input id="hDate" type="date">
+      <div class="total" style="margin-top:12px">
+        <div><span>Selesai</span><b id="hDone">0</b></div>
+        <div><span>Tak hadir</span><b id="hNoShow">0</b></div>
+        <div><span>Dibatalkan</span><b id="hCancel">0</b></div>
+      </div>
+      <div id="historyList"><div class="empty">Memuatkan…</div></div>
     </section>
   </div>
 
@@ -239,8 +254,9 @@ $("btnOut").onclick = async () => { await sb.auth.signOut(); location.reload(); 
 /* -------- tabs -------- */
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x===b));
-  ["today","setup","report"].forEach(t => $("tab-"+t).classList.toggle("hide", t!==b.dataset.tab));
+  ["today","history","setup","report"].forEach(t => $("tab-"+t).classList.toggle("hide", t!==b.dataset.tab));
   if(b.dataset.tab === "report") loadReport();
+  if(b.dataset.tab === "history") loadHistory();
 });
 
 /* -------- boot -------- */
@@ -374,6 +390,27 @@ $("btnWalk").onclick = async () => {
   $("wName").value = ""; $("wPhone").value = "";
   loadToday();
 };
+
+/* -------- sejarah -------- */
+const STATUS_LABEL = { done:"Selesai", no_show:"Tak hadir", cancelled:"Dibatalkan", waiting:"Menunggu", in_progress:"Sedang jalan" };
+$("hDate").onchange = loadHistory;
+async function loadHistory(){
+  if(!$("hDate").value) $("hDate").value = new Date().toISOString().slice(0,10);
+  const { data } = await sb.from("bookings").select("*")
+    .eq("shop_id", S.id).eq("booking_date", $("hDate").value).order("queue_no");
+  const rows = data || [];
+
+  $("hDone").textContent = rows.filter(r => r.status === "done").length;
+  $("hNoShow").textContent = rows.filter(r => r.status === "no_show").length;
+  $("hCancel").textContent = rows.filter(r => r.status === "cancelled").length;
+
+  $("historyList").innerHTML = rows.length ? rows.map(r => `
+    <div class="row">
+      <span class="no">${r.queue_no}</span>
+      <span class="nm">${r.customer_name}</span>
+      <span class="meta" style="width:100px;text-align:right">${STATUS_LABEL[r.status] || r.status}</span>
+    </div>`).join("") : '<div class="empty">Tiada booking pada tarikh ni.</div>';
+}
 
 /* -------- laporan -------- */
 $("mth").onchange = loadReport;

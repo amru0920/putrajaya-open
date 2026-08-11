@@ -80,40 +80,56 @@ tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
     <button class="mini" id="btnOut">Log keluar</button>
   </header>
 
-  <section>
-    <div class="eyebrow">Tambah barber baru</div>
-    <div class="card">
-      <label for="nEmail">E-mel barber</label>
-      <input id="nEmail" type="email" placeholder="barber@contoh.com">
-      <label for="nSlug">Slug (untuk link customer dia)</label>
-      <input id="nSlug" placeholder="contoh: ali">
-      <label for="nShopName">Nama kedai</label>
-      <input id="nShopName" placeholder="contoh: Kedai Gunting Ali">
-      <label for="nPass">Kata laluan sementara</label>
-      <input id="nPass" readonly>
-      <button class="act" id="btnAddBarber">Tambah barber</button>
-      <div id="addMsg"></div>
-    </div>
-  </section>
+  <div id="mainView">
+    <section>
+      <div class="eyebrow">Tambah barber baru</div>
+      <div class="card">
+        <label for="nEmail">E-mel barber</label>
+        <input id="nEmail" type="email" placeholder="barber@contoh.com">
+        <label for="nSlug">Slug (untuk link customer dia)</label>
+        <input id="nSlug" placeholder="contoh: ali">
+        <label for="nShopName">Nama kedai</label>
+        <input id="nShopName" placeholder="contoh: Kedai Gunting Ali">
+        <label for="nPass">Kata laluan sementara</label>
+        <input id="nPass" readonly>
+        <button class="act" id="btnAddBarber">Tambah barber</button>
+        <div id="addMsg"></div>
+      </div>
+    </section>
 
-  <section>
-    <div class="eyebrow">Semua kedai</div>
-    <div id="shopList"><div class="empty">Memuatkan…</div></div>
-  </section>
+    <section>
+      <div class="eyebrow">Semua kedai</div>
+      <div id="shopList"><div class="empty">Memuatkan…</div></div>
+    </section>
 
-  <section>
-    <div class="eyebrow">Laporan komisen — semua kedai</div>
-    <input id="mth" type="month">
-    <div class="total">
-      <div><span>Jumlah kepala</span><b id="tHeads">0</b></div>
-      <div><span>Jumlah komisen</span><b id="tCom">RM0</b></div>
-    </div>
-    <table>
-      <thead><tr><th>Kedai</th><th>Kepala</th><th>Tak hadir</th><th>Komisen</th></tr></thead>
-      <tbody id="rBody"></tbody>
-    </table>
-    <div class="empty hide" id="rEmpty">Tiada rekod untuk bulan ini.</div>
-  </section>
+    <section>
+      <div class="eyebrow">Laporan komisen — semua kedai</div>
+      <input id="mth" type="month">
+      <div class="total">
+        <div><span>Jumlah kepala</span><b id="tHeads">0</b></div>
+        <div><span>Jumlah komisen</span><b id="tCom">RM0</b></div>
+      </div>
+      <table>
+        <thead><tr><th>Kedai</th><th>Kepala</th><th>Tak hadir</th><th>Komisen</th></tr></thead>
+        <tbody id="rBody"></tbody>
+      </table>
+      <div class="empty hide" id="rEmpty">Tiada rekod untuk bulan ini.</div>
+    </section>
+  </div>
+
+  <div id="shopDetail" class="hide">
+    <section>
+      <div class="eyebrow"><a href="#" id="backToShops" style="color:inherit">‹ Balik ke semua kedai</a></div>
+      <h1 id="shDetailName" style="margin-bottom:12px"></h1>
+      <input id="shDate" type="date">
+      <div class="total" style="margin-top:12px">
+        <div><span>Selesai</span><b id="shDone">0</b></div>
+        <div><span>Tak hadir</span><b id="shNoShow">0</b></div>
+        <div><span>Dibatalkan</span><b id="shCancel">0</b></div>
+      </div>
+      <div id="shopHistoryList"><div class="empty">Memuatkan…</div></div>
+    </section>
+  </div>
 </div>
 </div>
 
@@ -197,17 +213,56 @@ async function boot(){
   $("appView").classList.remove("hide");
 
   $("shopList").innerHTML = shops.map(s => `
-    <div class="card" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+    <div class="card" data-shop="${s.id}" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer">
       <div>
         <div style="font-weight:600">${s.shop_name}</div>
         <div class="empty" style="padding:2px 0"><span class="dot${s.is_open?"":" off"}"></span>${s.is_open ? "Buka" : "Tutup"} · /${s.slug} · RM${Number(s.commission_per_head).toFixed(2)}/kepala</div>
       </div>
+      <span style="color:var(--muted);font-size:20px">›</span>
     </div>`).join("");
+  $("shopList").querySelectorAll("[data-shop]").forEach(el => el.onclick = () => openShop(el.dataset.shop));
 
   if(!$("mth").value) $("mth").value = new Date().toISOString().slice(0,7);
   await loadReport();
 }
 $("mth").onchange = loadReport;
+
+/* -------- history per kedai -------- */
+const STATUS_LABEL = { done:"Selesai", no_show:"Tak hadir", cancelled:"Dibatalkan", waiting:"Menunggu", in_progress:"Sedang jalan" };
+let currentShopId = null;
+
+function openShop(id){
+  currentShopId = id;
+  const s = shops.find(x => x.id === id);
+  $("shDetailName").textContent = s.shop_name;
+  $("mainView").classList.add("hide");
+  $("shopDetail").classList.remove("hide");
+  if(!$("shDate").value) $("shDate").value = new Date().toISOString().slice(0,10);
+  loadShopHistory();
+}
+$("backToShops").onclick = (e) => {
+  e.preventDefault();
+  $("shopDetail").classList.add("hide");
+  $("mainView").classList.remove("hide");
+};
+$("shDate").onchange = loadShopHistory;
+
+async function loadShopHistory(){
+  const { data } = await sb.from("bookings").select("*")
+    .eq("shop_id", currentShopId).eq("booking_date", $("shDate").value).order("queue_no");
+  const rows = data || [];
+
+  $("shDone").textContent = rows.filter(r => r.status === "done").length;
+  $("shNoShow").textContent = rows.filter(r => r.status === "no_show").length;
+  $("shCancel").textContent = rows.filter(r => r.status === "cancelled").length;
+
+  $("shopHistoryList").innerHTML = rows.length ? rows.map(r => `
+    <div class="row" style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)">
+      <span style="width:32px;color:var(--muted);font-weight:600">${r.queue_no}</span>
+      <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.customer_name}</span>
+      <span class="empty" style="padding:0;width:100px;text-align:right">${STATUS_LABEL[r.status] || r.status}</span>
+    </div>`).join("") : '<div class="empty">Tiada booking pada tarikh ni.</div>';
+}
 
 async function loadReport(){
   const m = $("mth").value || new Date().toISOString().slice(0,7);
