@@ -24,7 +24,9 @@
       "Bash(supabase projects *)",
       "Bash(mkdir -p \"d:/BARBER/supabase/functions/platform-add-barber\")",
       "Bash(python \"/tmp/gen_platform_assets.py\")",
-      "Bash(git status *)"
+      "Bash(git status *)",
+      "Bash(where deno *)",
+      "Bash(deno --version)"
     ],
     "additionalDirectories": [
       "d:\\BARBER\\supabase\\functions"
