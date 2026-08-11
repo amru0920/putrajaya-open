@@ -180,19 +180,17 @@ const note = (el, text, bad) =>
   el.innerHTML = text ? `<div class="msg${bad?" bad":""}">${text}</div>` : "";
 
 async function loadPicker(){
-  const { data } = await sb.from("shops_public").select("*").order("shop_name");
+  const { data } = await sb.from("shops_public").select("*").eq("is_open", true).order("shop_name");
   const rows = data || [];
   if(!rows.length){
-    $("pickerList").innerHTML = '<div class="empty">Tiada kedai lagi.</div>';
+    $("pickerList").innerHTML = '<div class="empty">Tiada barber buka sekarang. Cuba lagi nanti.</div>';
     return;
   }
   $("pickerList").innerHTML = rows.map(s => `
     <a class="shopcard" href="?kedai=${encodeURIComponent(s.slug)}">
       <div>
         <div class="shopcard-name">${s.shop_name}</div>
-        <div class="meta"><span class="dot${s.is_open ? "" : " off"}"></span>${
-          s.is_open ? `Buka · ${s.open_time.slice(0,5)}–${s.close_time.slice(0,5)}` : "Tutup"
-        }</div>
+        <div class="meta"><span class="dot"></span>Buka · ${s.open_time.slice(0,5)}–${s.close_time.slice(0,5)}</div>
       </div>
       <span class="chev">›</span>
     </a>`).join("");
