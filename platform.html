@@ -90,6 +90,8 @@ tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
         <input id="nSlug" placeholder="contoh: ali">
         <label for="nShopName">Nama kedai</label>
         <input id="nShopName" placeholder="contoh: Kedai Gunting Ali">
+        <label for="nCom">Komisen sekepala (RM)</label>
+        <input id="nCom" type="number" step="0.10" min="0" value="2.00">
         <label for="nPass">Kata laluan sementara</label>
         <input id="nPass" readonly>
         <button class="act" id="btnAddBarber">Tambah barber</button>
@@ -129,6 +131,24 @@ tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
       </div>
       <div id="shopHistoryList"><div class="empty">Memuatkan…</div></div>
     </section>
+
+    <section>
+      <div class="eyebrow">Komisen sekepala (RM)</div>
+      <div class="card">
+        <input id="shCom" type="number" step="0.10" min="0">
+        <button class="act" id="btnSaveCom">Simpan komisen</button>
+        <div id="comMsg"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Zon bahaya</div>
+      <div class="card">
+        <div class="meta">Padam kedai ni serta akaun login barber &amp; semua rekod booking dia. Tak boleh undo.</div>
+        <button class="act" id="btnDeleteShop" style="background:var(--danger)">Padam kedai ni selama-lamanya</button>
+        <div id="deleteMsg"></div>
+      </div>
+    </section>
   </div>
 </div>
 </div>
@@ -149,9 +169,12 @@ const ADD_ERR = {
   MISSING_FIELDS:"Isi semua ruangan.",
   INVALID_SLUG:"Slug tak sah — huruf kecil/nombor/tanda sengkang je, 2-40 aksara.",
   WEAK_PASSWORD:"Kata laluan terlalu pendek (min 8 aksara).",
+  INVALID_COMMISSION:"Komisen tak sah.",
   UNAUTHORIZED:"Akaun ni bukan platform admin.",
   USER_CREATE_FAILED:"Gagal buat akaun — mungkin e-mel dah digunakan.",
-  SHOP_CREATE_FAILED:"Gagal daftar kedai — mungkin slug dah digunakan."
+  SHOP_CREATE_FAILED:"Gagal daftar kedai — mungkin slug dah digunakan.",
+  SHOP_NOT_FOUND:"Kedai tak dijumpai.",
+  SHOP_DELETE_FAILED:"Gagal padam kedai. Cuba lagi."
 };
 function genPassword(){
   const bytes = crypto.getRandomValues(new Uint8Array(9));
@@ -170,12 +193,13 @@ $("btnAddBarber").onclick = async () => {
   const email = $("nEmail").value.trim();
   const slug = $("nSlug").value.trim().toLowerCase();
   const shop_name = $("nShopName").value.trim();
+  const commission_per_head = +$("nCom").value || 0;
   const password = $("nPass").value;
 
   $("btnAddBarber").disabled = true;
   $("btnAddBarber").textContent = "Menambah…";
   const { data, error } = await sb.functions.invoke("platform-add-barber", {
-    body: { email, password, slug, shop_name }
+    body: { email, password, slug, shop_name, commission_per_head }
   });
   $("btnAddBarber").disabled = false;
   $("btnAddBarber").textContent = "Tambah barber";
@@ -246,6 +270,8 @@ function openShop(id){
   currentShopId = id;
   const s = shops.find(x => x.id === id);
   $("shDetailName").textContent = s.shop_name;
+  $("shCom").value = s.commission_per_head;
+  note($("comMsg"), ""); note($("deleteMsg"), "");
   $("mainView").classList.add("hide");
   $("shopDetail").classList.remove("hide");
   if(!$("shDate").value) $("shDate").value = new Date().toISOString().slice(0,10);
@@ -257,6 +283,45 @@ $("backToShops").onclick = (e) => {
   $("mainView").classList.remove("hide");
 };
 $("shDate").onchange = loadShopHistory;
+
+$("btnSaveCom").onclick = async () => {
+  const v = +$("shCom").value;
+  if(!(v >= 0)) return note($("comMsg"), "Komisen tak sah.", true);
+  const { error } = await sb.from("shops").update({ commission_per_head: v }).eq("id", currentShopId);
+  note($("comMsg"), error ? "Gagal simpan." : "Komisen dikemas kini.", !!error);
+  if(!error){
+    const s = shops.find(x => x.id === currentShopId);
+    if(s) s.commission_per_head = v;
+  }
+};
+
+$("btnDeleteShop").onclick = async () => {
+  const s = shops.find(x => x.id === currentShopId);
+  const typed = prompt(`Ini PADAM KEKAL kedai "${s.shop_name}", akaun login barber, dan semua rekod booking dia — tak boleh undo.\n\nTaip nama kedai (${s.shop_name}) untuk sahkan:`);
+  if(typed !== s.shop_name) return;
+
+  $("btnDeleteShop").disabled = true;
+  $("btnDeleteShop").textContent = "Memadam…";
+  const { data, error } = await sb.functions.invoke("platform-delete-shop", {
+    body: { shop_id: currentShopId }
+  });
+  $("btnDeleteShop").disabled = false;
+  $("btnDeleteShop").textContent = "Padam kedai ni selama-lamanya";
+
+  let errCode = null;
+  if(error){
+    try { errCode = (await error.context.json()).error; } catch(_) { errCode = "SERVER_ERROR"; }
+  } else if(data?.error){
+    errCode = data.error;
+  }
+  if(errCode){
+    return note($("deleteMsg"), ADD_ERR[errCode] || "Gagal padam. Cuba lagi.", true);
+  }
+
+  $("shopDetail").classList.add("hide");
+  $("mainView").classList.remove("hide");
+  boot();
+};
 
 async function loadShopHistory(){
   const { data } = await sb.from("bookings").select("*")

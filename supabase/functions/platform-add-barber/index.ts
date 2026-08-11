@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
   try {
-    const { email, password, slug, shop_name } = await req.json();
+    const { email, password, slug, shop_name, commission_per_head } = await req.json();
 
     if (!email || !password || !slug || !shop_name) {
       return json({ error: "MISSING_FIELDS" }, 400);
@@ -30,6 +30,10 @@ Deno.serve(async (req) => {
     }
     if (String(password).length < 8) {
       return json({ error: "WEAK_PASSWORD" }, 400);
+    }
+    const commission = Number(commission_per_head ?? 0);
+    if (!Number.isFinite(commission) || commission < 0) {
+      return json({ error: "INVALID_COMMISSION" }, 400);
     }
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -59,7 +63,7 @@ Deno.serve(async (req) => {
     if (createErr) return json({ error: "USER_CREATE_FAILED", detail: createErr.message }, 400);
 
     const { data: shop, error: shopErr } = await admin.from("shops").insert({
-      owner_user_id: created.user.id, slug, shop_name,
+      owner_user_id: created.user.id, slug, shop_name, commission_per_head: commission,
     }).select().single();
 
     if (shopErr) {
