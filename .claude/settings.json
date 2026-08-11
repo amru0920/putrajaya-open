@@ -23,7 +23,8 @@
       "Bash(supabase --version)",
       "Bash(supabase projects *)",
       "Bash(mkdir -p \"d:/BARBER/supabase/functions/platform-add-barber\")",
-      "Bash(python \"/tmp/gen_platform_assets.py\")"
+      "Bash(python \"/tmp/gen_platform_assets.py\")",
+      "Bash(git status *)"
     ],
     "additionalDirectories": [
       "d:\\BARBER\\supabase\\functions"
