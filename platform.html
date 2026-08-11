@@ -192,8 +192,9 @@ $("btnAddBarber").onclick = async () => {
 
   note($("addMsg"),
     `Berjaya! Bagi kredential ni kepada barber:<br>
-     E-mel: <b>${email}</b><br>Kata laluan: <b>${password}</b><br>
-     Link customer dia: <b>?kedai=${slug}</b>`);
+     E-mel: <b>${email}</b><br>Kata laluan (sekali guna): <b>${password}</b><br>
+     Link customer dia: <b>?kedai=${slug}</b><br>
+     <span class="empty">Dia akan diminta tetapkan kata laluan sendiri lepas login pertama kali.</span>`);
   $("nEmail").value = ""; $("nSlug").value = ""; $("nShopName").value = "";
   $("nPass").value = genPassword();
   boot();

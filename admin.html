@@ -89,6 +89,22 @@ tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
   </section>
 </div>
 
+<!-- ===== TETAPKAN KATA LALUAN BARU (login pertama kali) ===== -->
+<div id="pwResetView" class="hide">
+  <header><h1>Tetapkan Kata Laluan</h1></header>
+  <section>
+    <div class="card">
+      <div class="meta">Ni login pertama kali awak. Sila tetapkan kata laluan baru sebelum teruskan.</div>
+      <label for="newPw">Kata laluan baru</label>
+      <input id="newPw" type="password" autocomplete="new-password">
+      <label for="newPw2">Ulang kata laluan baru</label>
+      <input id="newPw2" type="password" autocomplete="new-password">
+      <button class="act" id="btnSetPw">Simpan & log masuk</button>
+      <div id="pwResetMsg"></div>
+    </div>
+  </section>
+</div>
+
 <!-- ===== APP ===== -->
 <div id="appView" class="hide">
   <header>
@@ -259,10 +275,29 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab === "history") loadHistory();
 });
 
+/* -------- tetapkan kata laluan baru -------- */
+$("btnSetPw").onclick = async () => {
+  const p1 = $("newPw").value, p2 = $("newPw2").value;
+  if(p1.length < 8) return note($("pwResetMsg"), "Kata laluan min 8 aksara.", true);
+  if(p1 !== p2) return note($("pwResetMsg"), "Kata laluan tak sepadan.", true);
+  const { error } = await sb.auth.updateUser({ password: p1, data: { must_change_password: false } });
+  if(error) return note($("pwResetMsg"), "Gagal simpan. Cuba lagi.", true);
+  $("newPw").value = ""; $("newPw2").value = "";
+  $("pwResetView").classList.add("hide");
+  boot();
+};
+
 /* -------- boot -------- */
 async function boot(){
   const { data:{ session } } = await sb.auth.getSession();
   if(!session) return;
+
+  if(session.user.user_metadata?.must_change_password){
+    $("loginView").classList.add("hide");
+    $("pwResetView").classList.remove("hide");
+    return;
+  }
+
   const ok = await loadSettings();
   if(!ok) return note($("loginMsg"), "Akaun ni tiada kedai berdaftar. Hubungi platform admin.", true);
   $("loginView").classList.add("hide");
