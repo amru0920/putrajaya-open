@@ -144,6 +144,11 @@ tfoot td{font-weight:600;border-bottom:0;border-top:2px solid var(--ink)}
     <section>
       <div class="eyebrow">Zon bahaya</div>
       <div class="card">
+        <div class="meta">Kosongkan semua rekod booking &amp; komisen kedai ni (untuk buang data ujian). Kedai &amp; akaun barber kekal. Tak boleh undo.</div>
+        <button class="act" id="btnClearHistory" style="background:var(--danger)">Kosongkan sejarah kedai ni</button>
+        <div id="clearMsg"></div>
+      </div>
+      <div class="card" style="margin-top:12px">
         <div class="meta">Padam kedai ni serta akaun login barber &amp; semua rekod booking dia. Tak boleh undo.</div>
         <button class="act" id="btnDeleteShop" style="background:var(--danger)">Padam kedai ni selama-lamanya</button>
         <div id="deleteMsg"></div>
@@ -271,7 +276,7 @@ function openShop(id){
   const s = shops.find(x => x.id === id);
   $("shDetailName").textContent = s.shop_name;
   $("shCom").value = s.commission_per_head;
-  note($("comMsg"), ""); note($("deleteMsg"), "");
+  note($("comMsg"), ""); note($("deleteMsg"), ""); note($("clearMsg"), "");
   $("mainView").classList.add("hide");
   $("shopDetail").classList.remove("hide");
   if(!$("shDate").value) $("shDate").value = new Date().toISOString().slice(0,10);
@@ -292,6 +297,24 @@ $("btnSaveCom").onclick = async () => {
   if(!error){
     const s = shops.find(x => x.id === currentShopId);
     if(s) s.commission_per_head = v;
+  }
+};
+
+$("btnClearHistory").onclick = async () => {
+  const s = shops.find(x => x.id === currentShopId);
+  const typed = prompt(`Ini padam SEMUA rekod booking & komisen kedai "${s.shop_name}" — tak boleh undo. Kedai & akaun barber kekal.\n\nTaip nama kedai (${s.shop_name}) untuk sahkan:`);
+  if(typed !== s.shop_name) return;
+
+  $("btnClearHistory").disabled = true;
+  $("btnClearHistory").textContent = "Mengosongkan…";
+  const { error } = await sb.from("bookings").delete().eq("shop_id", currentShopId);
+  $("btnClearHistory").disabled = false;
+  $("btnClearHistory").textContent = "Kosongkan sejarah kedai ni";
+
+  note($("clearMsg"), error ? "Gagal kosongkan. Cuba lagi." : "Sejarah kedai ni dah dikosongkan.", !!error);
+  if(!error){
+    loadShopHistory();
+    loadReport();
   }
 };
 
